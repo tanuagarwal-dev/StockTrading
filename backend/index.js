@@ -1,26 +1,221 @@
-import express from "express"
+import express from "express";
 import dotenv from "dotenv";
 import mongoose from "mongoose";
-import cors from 'cors'
+import cors from "cors";
 import bodyParser from "body-parser";
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 import { HoldingsModel } from "./model/HoldingsModel.js";
 import { OrdersModel } from "./model/OrdersModel.js";
 import { PositionsModel } from "./model/PositionsModel.js";
+import { UserModel } from "./model/UserModel.js";
 
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3002;
-const MONGO_URI= process.env.MONGO_URL;
+const MONGO_URI = process.env.MONGO_URL;
+const JWT_SECRET = process.env.JWT_SECRET || "dev_jwt_secret_change_me";
 if (!MONGO_URI) {
-    console.log("Mongoose URL not defined in.env")
-    process.exit(1)
+  console.log("Mongoose URL not defined in.env");
+  process.exit(1);
 }
 
 app.use(cors());
 app.use(express.json());
 app.use(bodyParser.json());
 
+// --- Simple helpers ---
+const getCurrentPriceForSymbol = (symbol) => {
+  // Minimal simulated price feed; extend as needed.
+  const prices = {
+    INFY: 1555.45,
+    ONGC: 116.8,
+    TCS: 3194.8,
+    KPITTECH: 266.45,
+    "QUICKHEAL": 308.55,
+    WIPRO: 577.75,
+    "M&M": 779.8,
+    RELIANCE: 2112.4,
+    HUL: 512.4,
+    BHARTIARTL: 541.15,
+    HDFCBANK: 1522.35,
+    HINDUNILVR: 2417.4,
+    ITC: 207.9,
+    SBIN: 430.2,
+    SGBMAY29: 4719.0,
+    TATAPOWER: 124.15,
+  };
+
+  return prices[symbol] ?? 100;
+};
+
+// --- In-memory simulated market prices (independent of execution logic) ---
+const simulatedPrices = {
+  INFY: 1555.45,
+  TCS: 3194.8,
+  RELIANCE: 2112.4,
+  HDFCBANK: 1522.35,
+  SBIN: 430.2,
+  ITC: 207.9,
+};
+
+const updateSimulatedPrices = () => {
+  Object.keys(simulatedPrices).forEach((symbol) => {
+    const current = simulatedPrices[symbol];
+    const delta = (Math.random() * 0.01 - 0.005) * current; // ±0.5%
+    const next = current + delta;
+    simulatedPrices[symbol] = Math.max(1, next);
+  });
+};
+
+// update every 5 seconds
+setInterval(updateSimulatedPrices, 5000);
+
+// --- In-memory OHLC candles (1-minute, last 30 per symbol) ---
+// Structure: { [symbol]: Array<{ timestamp, open, high, low, close }> }
+const ohlcBySymbol = {};
+
+const floorToMinute = (date) => {
+  const d = new Date(date);
+  d.setSeconds(0, 0);
+  return d;
+};
+
+const updateOhlcFromPrices = () => {
+  const now = new Date();
+  const candleTime = floorToMinute(now);
+
+  Object.keys(simulatedPrices).forEach((symbol) => {
+    const price = simulatedPrices[symbol];
+    if (price == null) return;
+
+    if (!ohlcBySymbol[symbol]) {
+      ohlcBySymbol[symbol] = [];
+    }
+
+    const candles = ohlcBySymbol[symbol];
+    const lastCandle = candles[candles.length - 1];
+
+    if (
+      !lastCandle ||
+      new Date(lastCandle.timestamp).getTime() !== candleTime.getTime()
+    ) {
+      // start new candle
+      candles.push({
+        timestamp: candleTime.toISOString(),
+        open: price,
+        high: price,
+        low: price,
+        close: price,
+      });
+      // keep only last 30
+      if (candles.length > 30) {
+        candles.shift();
+      }
+    } else {
+      // update existing candle
+      if (price > lastCandle.high) {
+        lastCandle.high = price;
+      }
+      if (price < lastCandle.low) {
+        lastCandle.low = price;
+      }
+      lastCandle.close = price;
+    }
+  });
+};
+
+// drive OHLC updates from current simulated prices every 5 seconds
+setInterval(updateOhlcFromPrices, 5000);
+
+// Simple auth middleware
+const authMiddleware = (req, res, next) => {
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return res.status(401).json({ message: "Authorization header missing" });
+  }
+
+  const token = authHeader.split(" ")[1];
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET);
+    req.userId = decoded.userId;
+    next();
+  } catch (err) {
+    return res.status(401).json({ message: "Invalid or expired token" });
+  }
+};
+
+// Auth routes
+app.post("/auth/register", async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    if (!email || !password) {
+      return res.status(400).json({ message: "Email and password are required" });
+    }
+
+    const existing = await UserModel.findOne({ email: email.toLowerCase() });
+    if (existing) {
+      return res.status(409).json({ message: "User already exists" });
+    }
+
+    const passwordHash = await bcrypt.hash(password, 10);
+
+    const user = await UserModel.create({
+      email: email.toLowerCase(),
+      passwordHash,
+    });
+
+    const token = jwt.sign({ userId: user._id }, JWT_SECRET, {
+      expiresIn: "7d",
+    });
+
+    return res.status(201).json({
+      token,
+      user: {
+        id: user._id,
+        email: user.email,
+      },
+    });
+  } catch (err) {
+    console.error("Register error", err);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+app.post("/auth/login", async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    if (!email || !password) {
+      return res.status(400).json({ message: "Email and password are required" });
+    }
+
+    const user = await UserModel.findOne({ email: email.toLowerCase() });
+    if (!user) {
+      return res.status(401).json({ message: "Invalid credentials" });
+    }
+
+    const isMatch = await bcrypt.compare(password, user.passwordHash);
+    if (!isMatch) {
+      return res.status(401).json({ message: "Invalid credentials" });
+    }
+
+    const token = jwt.sign({ userId: user._id }, JWT_SECRET, {
+      expiresIn: "7d",
+    });
+
+    return res.json({
+      token,
+      user: {
+        id: user._id,
+        email: user.email,
+      },
+    });
+  } catch (err) {
+    console.error("Login error", err);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+});
 
 // app.get("/addHoldings", async (req, res) => {
 //   let tempHoldings = [
@@ -191,45 +386,210 @@ app.use(bodyParser.json());
 //   res.send("Done!");
 // });
 
-app.get("/allHoldings", async (req, res) => {
-  let allHoldings = await HoldingsModel.find({});
+// Protected portfolio & order routes
+app.get("/allHoldings", authMiddleware, async (req, res) => {
+  const allHoldings = await HoldingsModel.find({ user: req.userId });
   res.json(allHoldings);
 });
 
-app.get("/allPositions", async (req, res) => {
-  let allPositions = await PositionsModel.find({});
+app.get("/allPositions", authMiddleware, async (req, res) => {
+  const allPositions = await PositionsModel.find({ user: req.userId });
   res.json(allPositions);
 });
 
-app.get("/allOrders", async (req, res) => {
-  let allOrders = await OrdersModel.find({});
+app.get("/allOrders", authMiddleware, async (req, res) => {
+  const allOrders = await OrdersModel.find({ user: req.userId });
   res.json(allOrders);
 });
 
-app.post("/newOrder", async (req, res) => {
-  let newOrder = new OrdersModel({
-    name: req.body.name,
-    qty: req.body.qty,
-    price: req.body.price,
-    mode: req.body.mode,
-  });
+app.get("/executedOrders", authMiddleware, async (req, res) => {
+  const executed = await OrdersModel.find({
+    user: req.userId,
+    status: "EXECUTED",
+  })
+    .sort({ createdAt: -1 });
 
-  newOrder.save();
-
-  res.send("Order saved!");
+  res.json(executed);
 });
 
+// Read-only price APIs
+app.get("/prices", (req, res) => {
+  res.json(simulatedPrices);
+});
 
-mongoose.connect(MONGO_URI).
-    then(() => {
-        console.log("MongoDB connected");
-        app.listen(PORT, () => {
-            console.log(`Server is running on ${PORT}`);
+app.get("/price/:symbol", (req, res) => {
+  const symbol = req.params.symbol;
+  const upper = symbol.toUpperCase();
+  const price = simulatedPrices[upper];
+
+  if (price === undefined) {
+    return res.status(404).json({ message: "Symbol not found" });
+  }
+
+  res.json({ symbol: upper, price });
+});
+
+// OHLC candles (1-minute, last 30 per symbol)
+app.get("/ohlc/:symbol", (req, res) => {
+  const symbol = req.params.symbol;
+  const upper = symbol.toUpperCase();
+
+  if (simulatedPrices[upper] === undefined) {
+    return res.status(404).json({ message: "Symbol not found" });
+  }
+
+  const candles = ohlcBySymbol[upper] || [];
+  res.json(candles);
+});
+
+app.post("/newOrder", authMiddleware, async (req, res) => {
+  try {
+    const { name, qty, price, mode, orderType: rawOrderType } = req.body;
+
+    if (!name || !qty || !price || !mode) {
+      return res
+        .status(400)
+        .json({ message: "name, qty, price and mode are required" });
+    }
+
+    const side = mode === "SELL" ? "SELL" : "BUY";
+    const orderType =
+      rawOrderType === "LIMIT" || rawOrderType === "MARKET"
+        ? rawOrderType
+        : "MARKET";
+
+    const quantity = Number(qty);
+    const requestedPrice = Number(price);
+
+    if (!Number.isFinite(quantity) || quantity <= 0) {
+      return res.status(400).json({ message: "Invalid quantity" });
+    }
+
+    if (!Number.isFinite(requestedPrice) || requestedPrice <= 0) {
+      return res.status(400).json({ message: "Invalid price" });
+    }
+
+    const currentPrice = getCurrentPriceForSymbol(name);
+
+    let status = "REJECTED";
+    let executedPrice = null;
+    let realizedPnl = 0;
+    let rejectionReason = "";
+
+    // Decide execution price & status
+    if (orderType === "MARKET") {
+      status = "EXECUTED";
+      executedPrice = currentPrice;
+    } else {
+      // LIMIT logic
+      if (side === "BUY" && currentPrice <= requestedPrice) {
+        status = "EXECUTED";
+        executedPrice = requestedPrice;
+      } else if (side === "SELL" && currentPrice >= requestedPrice) {
+        status = "EXECUTED";
+        executedPrice = requestedPrice;
+      } else {
+        status = "REJECTED";
+        rejectionReason = "Limit price not met";
+      }
+    }
+
+    // If EXECUTED, update holdings (delivery only)
+    if (status === "EXECUTED") {
+      const execPrice = executedPrice;
+
+      if (side === "BUY") {
+        // BUY: increase or create holding, recalc avg price
+        let holding = await HoldingsModel.findOne({
+          user: req.userId,
+          name,
         });
-    })
-    .catch((err) => {
-        console.log("MongoDB connection error: ", err)
-        process.exit(1)
-    })
 
+        if (!holding) {
+          holding = new HoldingsModel({
+            user: req.userId,
+            name,
+            qty: quantity,
+            avg: execPrice,
+            price: execPrice,
+            net: "0%",
+            day: "0%",
+          });
+        } else {
+          const existingQty = holding.qty ?? 0;
+          const existingAvg = holding.avg ?? execPrice;
+          const newQty = existingQty + quantity;
+          const newAvg =
+            (existingAvg * existingQty + execPrice * quantity) / newQty;
 
+          holding.qty = newQty;
+          holding.avg = newAvg;
+          holding.price = execPrice;
+        }
+
+        await holding.save();
+        realizedPnl = 0;
+      } else {
+        // SELL: reduce holding qty and compute realized P&L
+        const holding = await HoldingsModel.findOne({
+          user: req.userId,
+          name,
+        });
+
+        if (!holding || (holding.qty ?? 0) < quantity) {
+          status = "REJECTED";
+          rejectionReason = "Insufficient quantity to sell";
+        } else {
+          const existingQty = holding.qty;
+          const existingAvg = holding.avg ?? execPrice;
+
+          realizedPnl = (execPrice - existingAvg) * quantity;
+
+          const newQty = existingQty - quantity;
+
+          if (newQty > 0) {
+            holding.qty = newQty;
+            holding.price = execPrice;
+            await holding.save();
+          } else {
+            // no more quantity left, remove holding
+            await holding.deleteOne();
+          }
+        }
+      }
+    }
+
+    const orderDoc = new OrdersModel({
+      user: req.userId,
+      name,
+      qty: quantity,
+      price: requestedPrice,
+      mode: side,
+      orderType,
+      status,
+      executedPrice,
+      realizedPnl,
+      rejectionReason,
+    });
+
+    await orderDoc.save();
+
+    return res.json(orderDoc);
+  } catch (err) {
+    console.error("New order error", err);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+mongoose
+  .connect(MONGO_URI)
+  .then(() => {
+    console.log("MongoDB connected");
+    app.listen(PORT, () => {
+      console.log(`Server is running on ${PORT}`);
+    });
+  })
+  .catch((err) => {
+    console.log("MongoDB connection error: ", err);
+    process.exit(1);
+  });
