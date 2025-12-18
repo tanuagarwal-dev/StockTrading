@@ -1,29 +1,45 @@
 "use client";
 
 import { useState, useContext } from "react";
-import axios from "axios";
 import GeneralContext from "@/context/GeneralContext";
+import apiClient from "@/lib/apiClient";
+
+type Side = "BUY" | "SELL";
 
 type Props = {
   uid: string;
+  mode: Side;
 };
 
-export default function BuyActionWindow({ uid }: Props) {
+export default function BuyActionWindow({ uid, mode }: Props) {
   const { closeBuyWindow } = useContext(GeneralContext);
 
   const [stockQuantity, setStockQuantity] = useState<number>(1);
-  const [stockPrice, setStockPrice] = useState<number>(0);
+  const [stockPrice, setStockPrice] = useState<number>(1);
+  const [orderType, setOrderType] = useState<"MARKET" | "LIMIT">("MARKET");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleBuyClick = async () => {
-    await axios.post("http://localhost:3002/newOrder", {
-      name: uid,
-      qty: stockQuantity,
-      price: stockPrice,
-      mode: "BUY",
-    });
-
-    closeBuyWindow();
+  const handleSubmit = async () => {
+    setIsSubmitting(true);
+    try {
+      await apiClient.post("/newOrder", {
+        name: uid,
+        qty: stockQuantity,
+        price: stockPrice,
+        mode,
+        orderType,
+      });
+      // let other parts of the app know portfolio has changed
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(new Event("portfolio-updated"));
+      }
+      closeBuyWindow();
+    } finally {
+      setIsSubmitting(false);
+    }
   };
+
+  const isBuy = mode === "BUY";
 
   return (
     <div className="fixed inset-0 z-50 bg-black/40 text-black flex items-end justify-center">
@@ -35,10 +51,11 @@ export default function BuyActionWindow({ uid }: Props) {
         {/* Header */}
         <div className="bg-[#4184f3] px-4 py-3 rounded-t-md">
           <h3 className=" text-base font-medium">
-            Buy {uid} <span className="text-xs font-normal">NSE</span>
+            {isBuy ? "Buy" : "Sell"} {uid}{" "}
+            <span className="text-xs font-normal">NSE</span>
           </h3>
           <p className="text-white text-xs font-light mt-1">
-            Market • Intraday
+            {orderType === "MARKET" ? "Market" : "Limit"} • Delivery
           </p>
         </div>
 
@@ -49,7 +66,8 @@ export default function BuyActionWindow({ uid }: Props) {
             {/* Qty */}
             <fieldset className="border border-gray-300 px-3 py-1 w-[120px]">
               <legend className="text-xs px-1 text-gray-700">Qty.</legend>
-              <input title="quantity"
+              <input
+                title="quantity"
                 type="number"
                 min={1}
                 value={stockQuantity}
@@ -61,7 +79,8 @@ export default function BuyActionWindow({ uid }: Props) {
             {/* Price */}
             <fieldset className="border border-gray-300 px-3 py-1 w-[120px]">
               <legend className="text-xs px-1 text-gray-400">Price</legend>
-              <input title="price"
+              <input
+                title="price"
                 type="number"
                 step="0.05"
                 value={stockPrice}
@@ -69,19 +88,35 @@ export default function BuyActionWindow({ uid }: Props) {
                 className="w-full text-lg outline-none"
               />
             </fieldset>
+
+            {/* Order type */}
+            <fieldset className="border border-gray-300 px-3 py-1 w-[140px]">
+              <legend className="text-xs px-1 text-gray-700">Order type</legend>
+              <select
+                value={orderType}
+                onChange={(e) =>
+                  setOrderType(e.target.value as "MARKET" | "LIMIT")
+                }
+                className="w-full text-sm outline-none bg-white"
+              >
+                <option value="MARKET">MARKET</option>
+                <option value="LIMIT">LIMIT</option>
+              </select>
+            </fieldset>
           </div>
         </div>
 
         {/* Footer */}
         <div className="absolute bottom-4 left-0 w-full px-6 flex justify-between items-center">
-          <span className="text-xs text-gray-600">Margin required ₹140.65</span>
+          <span className="text-xs text-gray-600">Delivery only</span>
 
           <div className="flex gap-2">
             <button
-              onClick={handleBuyClick}
+              onClick={handleSubmit}
+              disabled={isSubmitting}
               className="px-5 py-2 bg-[#4184f3] text-white text-sm rounded hover:bg-[#74a7fa]"
             >
-              Buy
+              {isSubmitting ? "Placing..." : isBuy ? "Buy" : "Sell"}
             </button>
 
             <button
