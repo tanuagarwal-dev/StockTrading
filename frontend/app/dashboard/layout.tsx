@@ -1,3 +1,7 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import WatchList from "@/components/dashboard/WatchList";
 import TopBar from "@/components/dashboard/TopBar";
 import { GeneralContextProvider } from "@/context/GeneralContext";
@@ -8,11 +12,28 @@ export default function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const router = useRouter();
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
+
+  useEffect(() => {
+    const token = typeof window !== "undefined"
+      ? localStorage.getItem("token")
+      : null;
+
+    if (!token) {
+      router.replace("/login");
+    } else {
+      setIsCheckingAuth(false);
+    }
+  }, [router]);
+
+  if (isCheckingAuth) {
+    return null;
+  }
+
   return (
     <GeneralContextProvider>
       <div className="min-h-screen bg-gray-50">
-        {/* Top bar */}
-
         {/* Body */}
         <div className="flex">
           {/* Left sidebar */}
@@ -22,7 +43,7 @@ export default function DashboardLayout({
           </aside>
 
           {/* Main content */}
-          <main className="flex-1  text-black">{children}</main>
+          <main className="flex-1 text-black">{children}</main>
         </div>
       </div>
     </GeneralContextProvider>

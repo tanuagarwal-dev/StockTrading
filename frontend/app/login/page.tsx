@@ -3,9 +3,8 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
-import Link from "next/link";
 
-export default function SignupPage() {
+export default function LoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -18,7 +17,7 @@ export default function SignupPage() {
     setIsSubmitting(true);
 
     try {
-      const res = await axios.post("http://localhost:3002/auth/register", {
+      const res = await axios.post("http://localhost:3002/auth/login", {
         email,
         password,
       });
@@ -28,12 +27,11 @@ export default function SignupPage() {
         localStorage.setItem("token", token);
         router.push("/dashboard");
       } else {
-        setError("Signup failed: token missing in response");
+        setError("Login failed: token missing in response");
       }
     } catch (err: any) {
       const message =
-        err?.response?.data?.message ||
-        "Unable to sign up. Please try again.";
+        err?.response?.data?.message || "Unable to login. Please try again.";
       setError(message);
     } finally {
       setIsSubmitting(false);
@@ -46,7 +44,7 @@ export default function SignupPage() {
         onSubmit={handleSubmit}
         className="w-full max-w-sm space-y-4 border p-6 rounded-md"
       >
-        <h1 className="text-xl font-semibold">Sign up</h1>
+        <h1 className="text-xl font-semibold">Login</h1>
 
         <div className="space-y-1">
           <label className="block text-sm">Email</label>
@@ -70,17 +68,18 @@ export default function SignupPage() {
           />
         </div>
 
-        {error && <p className="text-sm text-red-600">{error} <Link href="/login">Login</Link></p>}
+        {error && <p className="text-sm text-red-600">{error}</p>}
 
         <button
           type="submit"
           disabled={isSubmitting}
           className="w-full border px-3 py-2 text-sm"
         >
-          {isSubmitting ? "Signing up..." : "Sign up"}
+          {isSubmitting ? "Logging in..." : "Login"}
         </button>
       </form>
     </div>
   );
 }
+
 
