@@ -5,10 +5,13 @@ import Awards from "@/components/home/Awards";
 import Pricing from "@/components/home/Pricing";
 import Education from "@/components/home/Education";
 import OpenAccount from "@/components/common/OpenAccount";
+import Header from "@/components/common/header";
+import Footer from "@/components/common/footer";
 
 export default function Home() {
   return (
     <>
+      <Header/>
       <>
         
         <Hero />
@@ -19,6 +22,7 @@ export default function Home() {
         <OpenAccount />
         
       </>
+      <Footer/>
     </>
   );
 }
