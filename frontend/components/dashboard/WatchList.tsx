@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
 import { Tooltip, Grow } from "@mui/material";
 import {
   BarChartOutlined,
@@ -12,9 +12,10 @@ import {
 import GeneralContext from "@/context/GeneralContext";
 import { watchlist } from "../../lib/dashboardData";
 import { DoughnutChart } from "../../charts/DoughnutChart";
+import apiClient from "@/lib/apiClient";
 
 
-function WatchListItem({ stock }: any) {
+function WatchListItem({ stock, price }: any) {
   const [showActions, setShowActions] = useState(false);
 
   return (
@@ -39,7 +40,7 @@ function WatchListItem({ stock }: any) {
           ) : (
             <KeyboardArrowUp className="text-green-600" fontSize="small" />
           )}
-          <span>{stock.price}</span>
+          <span>{price.toFixed(2)}</span>
         </div>
       </div>
 
@@ -64,7 +65,10 @@ function WatchListActions({ uid }: { uid: string }) {
       </Tooltip>
 
       <Tooltip title="Sell (S)" arrow TransitionComponent={Grow}>
-        <button className="rounded bg-red-600 px-2 py-1 text-xs text-white hover:bg-red-700">
+        <button
+          onClick={() => generalContext.openSellWindow(uid)}
+          className="rounded bg-red-600 px-2 py-1 text-xs text-white hover:bg-red-700"
+        >
           Sell
         </button>
       </Tooltip>
@@ -89,6 +93,42 @@ function WatchListActions({ uid }: { uid: string }) {
 }
 
 export default function WatchList() {
+  const [prices, setPrices] = useState<Record<string, number>>(() => {
+    const initial: Record<string, number> = {};
+    watchlist.forEach((s) => {
+      initial[s.name] = s.price;
+    });
+    return initial;
+  });
+
+  useEffect(() => {
+    let intervalId: NodeJS.Timeout | null = null;
+
+    const fetchPrices = () => {
+      apiClient
+        .get("/prices")
+        .then((res) => {
+          const data = res.data as Record<string, number>;
+          setPrices((prev) => ({
+            ...prev,
+            ...data,
+          }));
+        })
+        .catch(() => {
+          // ignore errors for now
+        });
+    };
+
+    fetchPrices();
+    intervalId = setInterval(fetchPrices, 5000);
+
+    return () => {
+      if (intervalId) {
+        clearInterval(intervalId);
+      }
+    };
+  }, []);
+
   const labels = watchlist.map((s) => s.name);
 
   const data = {
@@ -96,7 +136,7 @@ export default function WatchList() {
     datasets: [
       {
         label: "Price",
-        data: watchlist.map((s) => s.price),
+        data: watchlist.map((s) => prices[s.name] ?? s.price),
         backgroundColor: [
           "#f87171",
           "#60a5fa",
@@ -126,7 +166,11 @@ export default function WatchList() {
       {/* Watchlist */}
       <ul className="space-y-1">
         {watchlist.map((stock) => (
-          <WatchListItem key={stock.name} stock={stock} />
+          <WatchListItem
+            key={stock.name}
+            stock={stock}
+            price={prices[stock.name] ?? stock.price}
+          />
         ))}
       </ul>
 
