@@ -12,12 +12,12 @@ export default function DashboardLayout({
     <GeneralContextProvider>
       <div className="min-h-screen bg-gray-50">
         {/* Top bar */}
-        <TopBar />
 
         {/* Body */}
         <div className="flex">
           {/* Left sidebar */}
-          <aside className="w-80 border-r bg-white">
+          <aside className="w-80 border-r bg-white text-black">
+            <TopBar />
             <WatchList />
           </aside>
 

@@ -26,7 +26,7 @@ export default function BuyActionWindow({ uid }: Props) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/40 flex items-end justify-center">
+    <div className="fixed inset-0 z-50 bg-black/40 text-black flex items-end justify-center">
       {/* Window */}
       <div
         draggable
@@ -34,7 +34,7 @@ export default function BuyActionWindow({ uid }: Props) {
       >
         {/* Header */}
         <div className="bg-[#4184f3] px-4 py-3 rounded-t-md">
-          <h3 className="text-white text-base font-medium">
+          <h3 className=" text-base font-medium">
             Buy {uid} <span className="text-xs font-normal">NSE</span>
           </h3>
           <p className="text-white text-xs font-light mt-1">

@@ -48,7 +48,7 @@ export default function Holdings() {
 
         {/* Table */}
         <div className="overflow-x-auto rounded-md border">
-          <table className="w-full text-sm">
+          <table className="w-full text-sm text-left">
             <thead className="bg-gray-50 text-gray-600">
               <tr>
                 <th className="px-3 py-2 text-left">Instrument</th>

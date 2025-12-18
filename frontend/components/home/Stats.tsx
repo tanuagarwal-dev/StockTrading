@@ -63,14 +63,14 @@ const Stats = () => {
 
           <div className="flex gap-8 text-sm">
             <a
-              href="#"
+              href="/products"
               className="text-blue-600 hover:underline inline-flex items-center gap-1"
             >
               Explore our products <span aria-hidden>→</span>
             </a>
 
             <a
-              href="#"
+              href="/dashboard"
               className="text-blue-600 hover:underline inline-flex items-center gap-1"
             >
               Try Kite demo <span aria-hidden>→</span>

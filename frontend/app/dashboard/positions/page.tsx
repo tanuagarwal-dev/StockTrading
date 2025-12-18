@@ -1,5 +1,8 @@
+"use client"
+import { useEffect, useState } from "react";
+import axios from "axios";
 import Menu from "@/components/dashboard/Menu";
-import { positions } from "@/lib/dashboardData";
+// import { positions } from "@/lib/dashboardData";
 
 type Position = {
   product: string;
@@ -12,18 +15,38 @@ type Position = {
 };
 
 export default function Positions() {
+    const [allPositions, setAllPositions] = useState<Position[]>([]);
+  
+    useEffect(() => {
+      axios.get("http://localhost:3002/allPositions").then((res) => {
+        setAllPositions(res.data);
+      });
+    }, []);
+  
+    const labels = allPositions.map((h) => h.name);
+  
+    const data = {
+      labels,
+      datasets: [
+        {
+          label: "Stock Price",
+          data: allPositions.map((h) => h.price),
+          backgroundColor: "rgba(59,130,246,0.6)", // Tailwind blue
+        },
+      ],
+    };
   return (
     <>
       <Menu />
       <section className="space-y-6 p-4">
         {/* Title */}
         <h3 className="text-lg font-semibold">
-          Positions ({positions.length})
+          Positions ({allPositions.length})
         </h3>
 
         {/* Table */}
         <div className="overflow-x-auto rounded-md border">
-          <table className="w-full text-sm">
+          <table className="w-full text-sm text-left">
             <thead className="bg-gray-50 text-gray-600">
               <tr>
                 <th className="px-3 py-2 text-left">Product</th>
@@ -37,7 +60,7 @@ export default function Positions() {
             </thead>
 
             <tbody>
-              {positions.map((stock: Position, index: number) => {
+              {allPositions.map((stock: Position, index: number) => {
                 const curValue = stock.price * stock.qty;
                 const pnl = curValue - stock.avg * stock.qty;
                 const isProfit = pnl >= 0;

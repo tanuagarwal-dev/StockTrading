@@ -98,7 +98,12 @@ export default function Menu() {
   const pathname = usePathname();
 
   return (
-    <div className="border-b bg-white">
+    <div className="border-b bg-white flex items-center justify-between px-4">
+      <img
+        src="/media/images/zerodhaFundhouse.png"
+        alt="Logo"
+        className="h-6 mx-6 my-4"
+      />
       <div className="hidden md:flex">
         {tabs.map((tab) => {
           const isActive = pathname === tab.href;
@@ -110,7 +115,7 @@ export default function Menu() {
                 ${
                   isActive
                     ? "border-blue-600 text-blue-600"
-                  : "border-transparent text-gray-500 hover:text-gray-700"  
+                    : "border-transparent text-gray-500 hover:text-gray-700"
                 }`}
             >
               {tab.label}
@@ -118,7 +123,7 @@ export default function Menu() {
           );
         })}
       </div>
-      <div className="flex md:hidden gap-6 px-6">
+      <div className="flex md:hidden gap-6 px-4">
         {tabs.map((tab) => {
           const isActive = pathname === tab.href;
 
@@ -137,6 +142,12 @@ export default function Menu() {
             </Link>
           );
         })}
+      </div>
+      <div className="flex items-center gap-3">
+        <div className="w-8 h-8 rounded-full bg-gray-800 text-white flex items-center justify-center text-sm font-semibold">
+          ZU
+        </div>
+        <span className="text-sm font-medium">USERID</span>
       </div>
     </div>
   );

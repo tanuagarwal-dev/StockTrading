@@ -153,24 +153,24 @@ app.use(bodyParser.json());
 // app.get("/addPositions", async (req, res) => {
 //   let tempPositions = [
 //     {
-//       product: "CNC",
-//       name: "EVEREADY",
-//       qty: 2,
-//       avg: 316.27,
-//       price: 312.35,
+//       product: "TBT",
+//       name: "YOYO",
+//       qty: 3,
+//       avg: 376.27,
+//       price: 389.35,
 //       net: "+0.58%",
 //       day: "-1.24%",
-//       isLoss: true,
+//       isLoss: false,
 //     },
 //     {
-//       product: "CNC",
-//       name: "JUBLFOOD",
+//       product: "YT",
+//       name: "BURGERS",
 //       qty: 1,
-//       avg: 3124.75,
-//       price: 3082.65,
+//       avg: 1124.75,
+//       price: 1082.65,
 //       net: "+10.04%",
 //       day: "-1.35%",
-//       isLoss: true,
+//       isLoss: false,
 //     },
 //   ];
 
@@ -199,6 +199,11 @@ app.get("/allHoldings", async (req, res) => {
 app.get("/allPositions", async (req, res) => {
   let allPositions = await PositionsModel.find({});
   res.json(allPositions);
+});
+
+app.get("/allOrders", async (req, res) => {
+  let allOrders = await OrdersModel.find({});
+  res.json(allOrders);
 });
 
 app.post("/newOrder", async (req, res) => {
