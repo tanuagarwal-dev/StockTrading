@@ -1,0 +1,71 @@
+import Menu from "@/components/dashboard/Menu";
+import { positions } from "@/lib/dashboardData";
+
+type Position = {
+  product: string;
+  name: string;
+  qty: number;
+  avg: number;
+  price: number;
+  day: string;
+  isLoss: boolean;
+};
+
+export default function Positions() {
+  return (
+    <>
+      <Menu />
+      <section className="space-y-6 p-4">
+        {/* Title */}
+        <h3 className="text-lg font-semibold">
+          Positions ({positions.length})
+        </h3>
+
+        {/* Table */}
+        <div className="overflow-x-auto rounded-md border">
+          <table className="w-full text-sm">
+            <thead className="bg-gray-50 text-gray-600">
+              <tr>
+                <th className="px-3 py-2 text-left">Product</th>
+                <th className="px-3 py-2 text-left">Instrument</th>
+                <th className="px-3 py-2 text-center">Qty</th>
+                <th className="px-3 py-2">Avg</th>
+                <th className="px-3 py-2">LTP</th>
+                <th className="px-3 py-2">P&amp;L</th>
+                <th className="px-3 py-2">Chg.</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              {positions.map((stock: Position, index: number) => {
+                const curValue = stock.price * stock.qty;
+                const pnl = curValue - stock.avg * stock.qty;
+                const isProfit = pnl >= 0;
+                const profitClass = isProfit
+                  ? "text-green-600"
+                  : "text-red-600";
+                const dayClass = stock.isLoss
+                  ? "text-red-600"
+                  : "text-green-600";
+
+                return (
+                  <tr key={index} className="border-t">
+                    <td className="px-3 py-2">{stock.product}</td>
+                    <td className="px-3 py-2">{stock.name}</td>
+                    <td className="px-3 py-2 text-center">{stock.qty}</td>
+                    <td className="px-3 py-2">{stock.avg.toFixed(2)}</td>
+                    <td className="px-3 py-2">{stock.price.toFixed(2)}</td>
+                    <td className={`px-3 py-2 ${profitClass}`}>
+                      {pnl.toFixed(2)}
+                    </td>
+                    <td className={`px-3 py-2 ${dayClass}`}>{stock.day}</td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </>
+  );
+}
