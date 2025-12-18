@@ -89,7 +89,9 @@ const tabs = [
   { label: "Summary", href: "/dashboard" },
   { label: "Orders", href: "/dashboard/orders" },
   { label: "Holdings", href: "/dashboard/holdings" },
-  { label: "Positions", href: "/dashboard/positions" },
+  // { label: "Positions", href: "/dashboard/positions" },
+  { label: "Trades", href: "/dashboard/trades" },
+  { label: "OHLC", href: "/dashboard/ohlc" },
   { label: "Funds", href: "/dashboard/funds" },
   { label: "Apps", href: "/dashboard/apps" },
 ];
