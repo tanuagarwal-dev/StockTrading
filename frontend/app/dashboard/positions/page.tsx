@@ -1,8 +1,8 @@
-"use client"
+"use client";
 import { useEffect, useState } from "react";
-import axios from "axios";
 import Menu from "@/components/dashboard/Menu";
 // import { positions } from "@/lib/dashboardData";
+import apiClient from "@/lib/apiClient";
 
 type Position = {
   product: string;
@@ -18,7 +18,7 @@ export default function Positions() {
     const [allPositions, setAllPositions] = useState<Position[]>([]);
   
     useEffect(() => {
-      axios.get("http://localhost:3002/allPositions").then((res) => {
+      apiClient.get("/allPositions").then((res) => {
         setAllPositions(res.data);
       });
     }, []);

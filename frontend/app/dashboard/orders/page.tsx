@@ -1,22 +1,45 @@
 "use client";
 import { useEffect, useState } from "react";
-import axios, { all } from "axios";
 import Menu from "@/components/dashboard/Menu";
 import Link from "next/link";
+import apiClient from "@/lib/apiClient";
 
 type Order = {
   name: string;
   qty: number;
   price: number;
   mode: string;
+  orderType?: string;
+  status?: string;
+  executedPrice?: number;
+  realizedPnl?: number;
+  rejectionReason?: string;
 };
 export default function Orders() {
     const [allOrders, setAllOrders] = useState<Order[]>([]);
 
-    useEffect(() => {
-      axios.get("http://localhost:3002/allOrders").then((res) => {
+    const fetchOrders = () => {
+      apiClient.get("/allOrders").then((res) => {
         setAllOrders(res.data);
       });
+    };
+
+    useEffect(() => {
+      fetchOrders();
+
+      const handler = () => {
+        fetchOrders();
+      };
+
+      if (typeof window !== "undefined") {
+        window.addEventListener("portfolio-updated", handler);
+      }
+
+      return () => {
+        if (typeof window !== "undefined") {
+          window.removeEventListener("portfolio-updated", handler);
+        }
+      };
     }, []);
 
     const labels = allOrders.map((h) => h.name);
@@ -62,6 +85,11 @@ export default function Orders() {
                   <th className="px-3 py-2 text-center">Qty</th>
                   <th className="px-3 py-2">Price</th>
                   <th className="px-3 py-2">Mode</th>
+                  <th className="px-3 py-2">Type</th>
+                  <th className="px-3 py-2">Status</th>
+                  <th className="px-3 py-2">Exec. price</th>
+                  <th className="px-3 py-2">Realized P&amp;L</th>
+                  <th className="px-3 py-2">Reason</th>
                 </tr>
               </thead>
 
@@ -73,6 +101,21 @@ export default function Orders() {
                       <td className="px-3 py-2 text-center">{stock.qty}</td>
                       <td className="px-3 py-2">{stock.price}</td>
                       <td className="px-3 py-2">{stock.mode}</td>
+                      <td className="px-3 py-2">{stock.orderType ?? "-"}</td>
+                      <td className="px-3 py-2">{stock.status ?? "-"}</td>
+                      <td className="px-3 py-2">
+                        {stock.executedPrice !== undefined
+                          ? stock.executedPrice
+                          : "-"}
+                      </td>
+                      <td className="px-3 py-2">
+                        {stock.realizedPnl !== undefined
+                          ? stock.realizedPnl.toFixed(2)
+                          : "-"}
+                      </td>
+                      <td className="px-3 py-2 text-xs text-red-600">
+                        {stock.rejectionReason ?? ""}
+                      </td>
                     </tr>
                   );
                 })}

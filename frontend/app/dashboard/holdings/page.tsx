@@ -1,9 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import axios from "axios";
 import VerticalGraph from "../../../charts/VerticalGraph";
 import Menu from "@/components/dashboard/Menu";
+import apiClient from "@/lib/apiClient";
+import CSVExport from "@/components/common/CSVExport";
 
 type Holding = {
   name: string;
@@ -17,11 +18,58 @@ type Holding = {
 
 export default function Holdings() {
   const [allHoldings, setAllHoldings] = useState<Holding[]>([]);
+  const [livePrices, setLivePrices] = useState<Record<string, number>>({});
 
-  useEffect(() => {
-    axios.get("http://localhost:3002/allHoldings").then((res) => {
+  const fetchHoldings = () => {
+    apiClient.get("/allHoldings").then((res) => {
       setAllHoldings(res.data);
     });
+  };
+
+  useEffect(() => {
+    fetchHoldings();
+
+    const handler = () => {
+      fetchHoldings();
+    };
+
+    if (typeof window !== "undefined") {
+      window.addEventListener("portfolio-updated", handler);
+    }
+
+    return () => {
+      if (typeof window !== "undefined") {
+        window.removeEventListener("portfolio-updated", handler);
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    let intervalId: NodeJS.Timeout | null = null;
+
+    const fetchPrices = () => {
+      apiClient
+        .get("/prices")
+        .then((res) => {
+          const data = res.data as Record<string, number>;
+          setLivePrices((prev) => ({
+            ...prev,
+            ...data,
+          }));
+        })
+        .catch(() => {
+          // ignore errors
+        });
+    };
+
+    fetchPrices();
+    intervalId = setInterval(fetchPrices, 5000);
+
+    return () => {
+      if (intervalId) {
+        clearInterval(intervalId);
+      }
+    };
   }, []);
 
   const labels = allHoldings.map((h) => h.name);
@@ -40,6 +88,17 @@ export default function Holdings() {
   return (
     <>
       <Menu />
+      <CSVExport
+  data={allHoldings}
+  filename="holdings.csv"
+  headers={[
+    { key: 'name', label: 'Symbol' },
+    { key: 'qty', label: 'Quantity' },
+    { key: 'avg', label: 'Average Price' },
+    { key: 'price', label: 'Current Price' },
+  ]}
+/>
+
       <section className="space-y-8 p-4">
         {/* Title */}
         <h3 className="text-lg font-semibold">
@@ -64,7 +123,8 @@ export default function Holdings() {
 
             <tbody>
               {allHoldings.map((stock, index) => {
-                const curValue = stock.price * stock.qty;
+                const currentPrice = livePrices[stock.name] ?? stock.price;
+                const curValue = currentPrice * stock.qty;
                 const pnl = curValue - stock.avg * stock.qty;
                 const isProfit = pnl >= 0;
                 const profitClass = isProfit
@@ -79,7 +139,7 @@ export default function Holdings() {
                     <td className="px-3 py-2">{stock.name}</td>
                     <td className="px-3 py-2 text-center">{stock.qty}</td>
                     <td className="px-3 py-2">{stock.avg.toFixed(2)}</td>
-                    <td className="px-3 py-2">{stock.price.toFixed(2)}</td>
+                    <td className="px-3 py-2">{currentPrice.toFixed(2)}</td>
                     <td className="px-3 py-2">{curValue.toFixed(2)}</td>
                     <td className={`px-3 py-2 ${profitClass}`}>
                       {pnl.toFixed(2)}
