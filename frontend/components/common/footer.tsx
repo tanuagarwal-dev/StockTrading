@@ -1,127 +1,179 @@
-import React from "react";
+import Link from "next/link";
+import Image from "next/image";
 
 const Footer = () => {
   return (
-    <footer className="bg-gray-50 border-t border-gray-200">
+    <footer className="bg-gray-50 dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
       <div className="max-w-7xl mx-auto px-6 py-12">
-        {/* Top grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-10">
-          {/* Logo + copyright */}
           <div>
-            <img
+            <Image
               src="/media/images/logo.svg"
               alt="Zerodha"
+              width={128}
+              height={32}
+              sizes="128px"
               className="w-32 mb-4"
             />
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-gray-600 dark:text-gray-400">
               © 2010 – 2024, Not Zerodha Broking Ltd. All rights reserved.
             </p>
           </div>
 
-          {/* Company */}
           <div>
-            <h4 className="font-semibold mb-4">Company</h4>
-            <ul className="space-y-2 text-sm text-gray-600">
+            <h4 className="font-semibold mb-4 text-gray-900 dark:text-white">
+              Company
+            </h4>
+            <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
               <li>
-                <a href="#" className="hover:text-blue-600">
+                <Link
+                  href="/about"
+                  className="hover:text-blue-600 dark:hover:text-blue-400"
+                >
                   About
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#" className="hover:text-blue-600">
+                <Link
+                  href="/products"
+                  className="hover:text-blue-600 dark:hover:text-blue-400"
+                >
                   Products
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#" className="hover:text-blue-600">
+                <Link
+                  href="/pricing"
+                  className="hover:text-blue-600 dark:hover:text-blue-400"
+                >
                   Pricing
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#" className="hover:text-blue-600">
+                <Link
+                  href="#"
+                  className="hover:text-blue-600 dark:hover:text-blue-400"
+                >
                   Referral programme
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#" className="hover:text-blue-600">
+                <Link
+                  href="#"
+                  className="hover:text-blue-600 dark:hover:text-blue-400"
+                >
                   Careers
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#" className="hover:text-blue-600">
+                <Link
+                  href="#"
+                  className="hover:text-blue-600 dark:hover:text-blue-400"
+                >
                   Zerodha.tech
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#" className="hover:text-blue-600">
+                <Link
+                  href="#"
+                  className="hover:text-blue-600 dark:hover:text-blue-400"
+                >
                   Press & media
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#" className="hover:text-blue-600">
+                <Link
+                  href="#"
+                  className="hover:text-blue-600 dark:hover:text-blue-400"
+                >
                   Zerodha cares (CSR)
-                </a>
+                </Link>
               </li>
             </ul>
           </div>
 
-          {/* Support */}
           <div>
-            <h4 className="font-semibold mb-4">Support</h4>
-            <ul className="space-y-2 text-sm text-gray-600">
+            <h4 className="font-semibold mb-4 text-gray-900 dark:text-white">
+              Support
+            </h4>
+            <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
               <li>
-                <a href="#" className="hover:text-blue-600">
+                <Link
+                  href="#"
+                  className="hover:text-blue-600 dark:hover:text-blue-400"
+                >
                   Contact
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#" className="hover:text-blue-600">
+                <Link
+                  href="/support"
+                  className="hover:text-blue-600 dark:hover:text-blue-400"
+                >
                   Support portal
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#" className="hover:text-blue-600">
+                <Link
+                  href="#"
+                  className="hover:text-blue-600 dark:hover:text-blue-400"
+                >
                   Z-Connect blog
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#" className="hover:text-blue-600">
+                <Link
+                  href="#"
+                  className="hover:text-blue-600 dark:hover:text-blue-400"
+                >
                   List of charges
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#" className="hover:text-blue-600">
+                <Link
+                  href="#"
+                  className="hover:text-blue-600 dark:hover:text-blue-400"
+                >
                   Downloads & resources
-                </a>
+                </Link>
               </li>
             </ul>
           </div>
 
-          {/* Account */}
           <div>
-            <h4 className="font-semibold mb-4">Account</h4>
-            <ul className="space-y-2 text-sm text-gray-600">
+            <h4 className="font-semibold mb-4 text-gray-900 dark:text-white">
+              Account
+            </h4>
+            <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
               <li>
-                <a href="#" className="hover:text-blue-600">
+                <Link
+                  href="/signup"
+                  className="hover:text-blue-600 dark:hover:text-blue-400"
+                >
                   Open an account
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#" className="hover:text-blue-600">
+                <Link
+                  href="#"
+                  className="hover:text-blue-600 dark:hover:text-blue-400"
+                >
                   Fund transfer
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#" className="hover:text-blue-600">
+                <Link
+                  href="#"
+                  className="hover:text-blue-600 dark:hover:text-blue-400"
+                >
                   60 day challenge
-                </a>
+                </Link>
               </li>
             </ul>
           </div>
         </div>
 
-        {/* Disclaimer */}
-        <div className="mt-12 text-xs text-gray-500 space-y-4 leading-relaxed">
+        <div className="mt-12 text-xs text-gray-500 dark:text-gray-400 space-y-4 leading-relaxed">
           <p>
             Zerodha Broking Ltd.: Member of NSE & BSE – SEBI Registration no.:
             INZ000031633 CDSL: Depository services through Zerodha Securities

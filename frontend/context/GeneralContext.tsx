@@ -9,18 +9,26 @@ type GeneralContextType = {
   openBuyWindow: (uid: string) => void;
   openSellWindow: (uid: string) => void;
   closeBuyWindow: () => void;
+  selectedStock: { symbol: string; price: number } | null;
+  setSelectedStock: (stock: { symbol: string; price: number } | null) => void;
 };
 
 const GeneralContext = createContext<GeneralContextType>({
   openBuyWindow: () => {},
   openSellWindow: () => {},
   closeBuyWindow: () => {},
+  selectedStock: null,
+  setSelectedStock: () => {},
 });
 
 export function GeneralContextProvider({ children }: { children: ReactNode }) {
   const [isBuyWindowOpen, setIsBuyWindowOpen] = useState(false);
   const [selectedStockUID, setSelectedStockUID] = useState<string | null>(null);
   const [side, setSide] = useState<Side>("BUY");
+  const [selectedStock, setSelectedStock] = useState<{
+    symbol: string;
+    price: number;
+  } | null>(null);
 
   const openBuyWindow = (uid: string) => {
     setSide("BUY");
@@ -45,6 +53,8 @@ export function GeneralContextProvider({ children }: { children: ReactNode }) {
         openBuyWindow,
         openSellWindow,
         closeBuyWindow,
+        selectedStock,
+        setSelectedStock,
       }}
     >
       {children}
