@@ -15,6 +15,13 @@ type Trade = {
   createdAt?: string;
 };
 
+type Meta = {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+};
+
 function formatDate(dateString?: string) {
   if (!dateString) return "-";
   const d = new Date(dateString);
@@ -34,18 +41,28 @@ export default function TradesPage() {
   const [selectedDate, setSelectedDate] = useState<string>(
     toDateInputValue(new Date())
   );
+  const [meta, setMeta] = useState<Meta>({ page: 1, limit: 20, total: 0, totalPages: 0 });
+     const [page, setPage] = useState(1);
+     const LIMIT = 5;
 
-  const fetchTrades = () => {
-    apiClient.get("/executedOrders").then((res) => {
-      setTrades(res.data);
-    });
+  const fetchTrades = (pageNum=page) => {
+    try {
+      apiClient.get("/executedOrders", {
+        params: { page: pageNum, limit: LIMIT }
+      }).then((res) => {
+        setTrades(res.data.data);
+        setMeta(res.data.meta);
+      });
+    } catch (error) {
+      console.error("Failed to fetch trades:", error);
+    }
   };
 
   useEffect(() => {
-    fetchTrades();
+    fetchTrades(page);
 
     const handler = () => {
-      fetchTrades();
+      fetchTrades(page);
     };
 
     if (typeof window !== "undefined") {
@@ -57,7 +74,7 @@ export default function TradesPage() {
         window.removeEventListener("portfolio-updated", handler);
       }
     };
-  }, []);
+  }, [page]);
 
   const tradesForDay = useMemo(() => {
     if (!selectedDate) return trades;
@@ -185,6 +202,29 @@ export default function TradesPage() {
             </tbody>
           </table>
         </div>
+        {meta && meta.totalPages > 1 && (
+          <div className="flex items-center justify-end gap-4">
+            <button
+              disabled={meta.page === 1}
+              onClick={() => setPage((p) => p - 1)}
+              className="px-3 py-1 border rounded disabled:opacity-50"
+            >
+              Prev
+            </button>
+
+            <span className="text-sm text-gray-600">
+              Page {meta.page} of {meta.totalPages}
+            </span>
+
+            <button
+              disabled={meta.page === meta.totalPages}
+              onClick={() => setPage((p) => p + 1)}
+              className="px-3 py-1 border rounded disabled:opacity-50"
+            >
+              Next
+            </button>
+          </div>
+        )}
       </section>
     </>
   );
