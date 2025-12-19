@@ -57,9 +57,7 @@ export default function Holdings() {
             ...data,
           }));
         })
-        .catch(() => {
-          // ignore errors
-        });
+        .catch(() => {});
     };
 
     fetchPrices();
@@ -89,23 +87,21 @@ export default function Holdings() {
     <>
       <Menu />
       <CSVExport
-  data={allHoldings}
-  filename="holdings.csv"
-  headers={[
-    { key: 'name', label: 'Symbol' },
-    { key: 'qty', label: 'Quantity' },
-    { key: 'avg', label: 'Average Price' },
-    { key: 'price', label: 'Current Price' },
-  ]}
-/>
+        data={allHoldings}
+        filename="holdings.csv"
+        headers={[
+          { key: "name", label: "Symbol" },
+          { key: "qty", label: "Quantity" },
+          { key: "avg", label: "Average Price" },
+          { key: "price", label: "Current Price" },
+        ]}
+      />
 
       <section className="space-y-8 p-4">
-        {/* Title */}
         <h3 className="text-lg font-semibold">
           Holdings ({allHoldings.length})
         </h3>
 
-        {/* Table */}
         <div className="overflow-x-auto rounded-md border">
           <table className="w-full text-sm text-left">
             <thead className="bg-gray-50 text-gray-600">
@@ -153,7 +149,6 @@ export default function Holdings() {
           </table>
         </div>
 
-        {/* Summary */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
           <div>
             <h5 className="text-lg font-semibold">
@@ -177,7 +172,6 @@ export default function Holdings() {
           </div>
         </div>
 
-        {/* Graph */}
         <VerticalGraph data={data} />
       </section>
     </>

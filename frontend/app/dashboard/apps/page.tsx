@@ -1,5 +1,4 @@
 import Menu from "@/components/dashboard/Menu";
-import React from "react";
 
 const Apps = () => {
   return (

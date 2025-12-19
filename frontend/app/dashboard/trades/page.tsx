@@ -67,9 +67,7 @@ export default function TradesPage() {
       if (!t.createdAt) return false;
       const dt = new Date(t.createdAt);
       return (
-        dt.getFullYear() === y &&
-        dt.getMonth() + 1 === m &&
-        dt.getDate() === d
+        dt.getFullYear() === y && dt.getMonth() + 1 === m && dt.getDate() === d
       );
     });
   }, [trades, selectedDate]);
@@ -84,26 +82,29 @@ export default function TradesPage() {
   );
 
   const pnlClass =
-    totalRealizedPnl > 0 ? "text-green-600" : totalRealizedPnl < 0 ? "text-red-600" : "";
+    totalRealizedPnl > 0
+      ? "text-green-600"
+      : totalRealizedPnl < 0
+      ? "text-red-600"
+      : "";
 
   return (
     <>
       <Menu />
       <CSVExport
-  data={trades}
-  filename="trades.csv"
-  headers={[
-    { key: 'createdAt', label: 'Date' },
-    { key: 'name', label: 'Symbol' },
-    { key: 'mode', label: 'Side' },
-    { key: 'qty', label: 'Quantity' },
-    { key: 'executedPrice', label: 'Executed Price' },
-    { key: 'realizedPnl', label: 'Realized P&L' },
-  ]}
-/>
+        data={trades}
+        filename="trades.csv"
+        headers={[
+          { key: "createdAt", label: "Date" },
+          { key: "name", label: "Symbol" },
+          { key: "mode", label: "Side" },
+          { key: "qty", label: "Quantity" },
+          { key: "executedPrice", label: "Executed Price" },
+          { key: "realizedPnl", label: "Realized P&L" },
+        ]}
+      />
 
       <section className="space-y-6 p-4">
-        {/* Header / summary */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
             <h3 className="text-lg font-semibold">Trade Book</h3>
@@ -124,7 +125,9 @@ export default function TradesPage() {
             </label>
 
             <div className="text-sm">
-              <span className="text-gray-600 mr-1">Total realized P&amp;L:</span>
+              <span className="text-gray-600 mr-1">
+                Total realized P&amp;L:
+              </span>
               <span className={`font-semibold ${pnlClass}`}>
                 {totalRealizedPnl.toFixed(2)}
               </span>
@@ -132,7 +135,6 @@ export default function TradesPage() {
           </div>
         </div>
 
-        {/* Table */}
         <div className="overflow-x-auto rounded-md border">
           <table className="w-full text-sm text-left">
             <thead className="bg-gray-50 text-gray-600">
@@ -187,5 +189,3 @@ export default function TradesPage() {
     </>
   );
 }
-
-

@@ -28,9 +28,7 @@ export default function OhlcPage() {
         .then((res) => {
           setCandles(res.data as Candle[]);
         })
-        .catch(() => {
-          // ignore errors for now
-        });
+        .catch(() => {});
     };
 
     fetchOhlc();
@@ -86,5 +84,3 @@ export default function OhlcPage() {
     </>
   );
 }
-
-

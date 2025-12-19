@@ -1,46 +1,73 @@
 "use client";
 
 import { useState, useContext, useEffect } from "react";
-import { Tooltip, Grow } from "@mui/material";
-import {
-  BarChartOutlined,
-  KeyboardArrowDown,
-  KeyboardArrowUp,
-  MoreHoriz,
-} from "@mui/icons-material";
-
 import GeneralContext from "@/context/GeneralContext";
 import { watchlist } from "../../lib/dashboardData";
 import { DoughnutChart } from "../../charts/DoughnutChart";
 import apiClient from "@/lib/apiClient";
 
-
 function WatchListItem({ stock, price }: any) {
   const [showActions, setShowActions] = useState(false);
+  const generalContext = useContext(GeneralContext);
 
   return (
     <li
       onMouseEnter={() => setShowActions(true)}
       onMouseLeave={() => setShowActions(false)}
-      className="relative rounded-md px-2 py-1 hover:bg-gray-50"
+      onClick={() =>
+        generalContext.setSelectedStock({ symbol: stock.name, price })
+      }
+      className="relative rounded-lg px-3 py-2.5 bg-gray-50 dark:bg-gray-900 hover:bg-blue-50 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700 cursor-pointer transition-all duration-200 hover:shadow-md"
     >
       <div className="flex justify-between items-center">
         <p
-          className={`text-sm font-medium ${
-            stock.isDown ? "text-red-600" : "text-green-600"
+          className={`text-sm font-semibold ${
+            stock.isDown
+              ? "text-red-600 dark:text-red-400"
+              : "text-green-600 dark:text-green-400"
           }`}
         >
           {stock.name}
         </p>
 
-        <div className="flex items-center gap-1 text-sm">
-          <span>{stock.percent}</span>
+        <div className="flex items-center gap-2 text-xs">
+          <span
+            className={`font-medium ${
+              stock.isDown
+                ? "text-red-600 dark:text-red-400"
+                : "text-green-600 dark:text-green-400"
+            }`}
+          >
+            {stock.percent}
+          </span>
           {stock.isDown ? (
-            <KeyboardArrowDown className="text-red-600" fontSize="small" />
+            <svg
+              className="w-4 h-4 text-red-600 dark:text-red-400"
+              fill="currentColor"
+              viewBox="0 0 20 20"
+            >
+              <path
+                fillRule="evenodd"
+                d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                clipRule="evenodd"
+              />
+            </svg>
           ) : (
-            <KeyboardArrowUp className="text-green-600" fontSize="small" />
+            <svg
+              className="w-4 h-4 text-green-600 dark:text-green-400"
+              fill="currentColor"
+              viewBox="0 0 20 20"
+            >
+              <path
+                fillRule="evenodd"
+                d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z"
+                clipRule="evenodd"
+              />
+            </svg>
           )}
-          <span>{price.toFixed(2)}</span>
+          <span className="font-bold text-gray-900 dark:text-white">
+            ₹{price.toFixed(2)}
+          </span>
         </div>
       </div>
 
@@ -49,45 +76,46 @@ function WatchListItem({ stock, price }: any) {
   );
 }
 
-
 function WatchListActions({ uid }: { uid: string }) {
   const generalContext = useContext(GeneralContext);
 
   return (
-    <div className="absolute right-0 top-full mt-1 flex gap-1 bg-white border rounded-md p-1 shadow-sm z-10">
-      <Tooltip title="Buy (B)" arrow TransitionComponent={Grow}>
-        <button
-          onClick={() => generalContext.openBuyWindow(uid)}
-          className="rounded bg-green-600 px-2 py-1 text-xs text-white hover:bg-green-700"
-        >
-          Buy
-        </button>
-      </Tooltip>
+    <div className="absolute right-0 top-full mt-2 flex gap-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg p-2 shadow-lg z-10">
+      <button
+        onClick={() => generalContext.openBuyWindow(uid)}
+        title="Buy (B)"
+        className="rounded-md bg-green-600 hover:bg-green-700 px-3 py-1.5 text-xs font-semibold text-white transition shadow-sm"
+      >
+        Buy
+      </button>
 
-      <Tooltip title="Sell (S)" arrow TransitionComponent={Grow}>
-        <button
-          onClick={() => generalContext.openSellWindow(uid)}
-          className="rounded bg-red-600 px-2 py-1 text-xs text-white hover:bg-red-700"
-        >
-          Sell
-        </button>
-      </Tooltip>
+      <button
+        onClick={() => generalContext.openSellWindow(uid)}
+        title="Sell (S)"
+        className="rounded-md bg-red-600 hover:bg-red-700 px-3 py-1.5 text-xs font-semibold text-white transition shadow-sm"
+      >
+        Sell
+      </button>
 
-      <Tooltip title="Analytics (A)" arrow TransitionComponent={Grow}>
-        <button
-          title="Analytics"
-          type="button"
-          className="rounded p-1 hover:bg-gray-100"
-        >
-          <BarChartOutlined fontSize="small" />
-        </button>
-      </Tooltip>
+      <button
+        title="Analytics (A)"
+        type="button"
+        className="rounded-md p-1.5 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 transition"
+      >
+        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+          <path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z" />
+        </svg>
+      </button>
 
-      <Tooltip title="More" arrow TransitionComponent={Grow}>
-        <button type="button" title="more" className="rounded p-1 hover:bg-gray-100">
-          <MoreHoriz fontSize="small" />
-        </button>
-      </Tooltip>
+      <button
+        type="button"
+        title="More"
+        className="rounded-md p-1.5 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 transition"
+      >
+        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+          <path d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM16 12a2 2 0 100-4 2 2 0 000 4z" />
+        </svg>
+      </button>
     </div>
   );
 }
@@ -114,9 +142,7 @@ export default function WatchList() {
             ...data,
           }));
         })
-        .catch(() => {
-          // ignore errors for now
-        });
+        .catch(() => {});
     };
 
     fetchPrices();
@@ -150,21 +176,24 @@ export default function WatchList() {
   };
 
   return (
-    <aside className="w-80 border-r bg-white p-4 space-y-6">
-      {/* Search */}
-      <div className="flex items-center gap-2">
+    <aside className="p-4 space-y-6 overflow-y-auto max-h-[calc(100vh-4rem)]">
+      <div className="space-y-2">
         <input
           type="text"
           placeholder="Search eg: infy, bse, nifty fut"
-          className="w-full rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+          className="w-full rounded-lg border border-gray-300 dark:border-gray-600 px-4 py-2.5 text-sm bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 transition shadow-sm"
         />
-        <span className="text-xs text-gray-500">
-          {watchlist.length} / 50
-        </span>
+        <div className="flex items-center justify-between">
+          <span className="text-xs font-medium text-gray-600 dark:text-gray-400">
+            Watchlist
+          </span>
+          <span className="text-xs font-semibold text-blue-600 dark:text-blue-400">
+            {watchlist.length} / 50
+          </span>
+        </div>
       </div>
 
-      {/* Watchlist */}
-      <ul className="space-y-1">
+      <ul className="space-y-2">
         {watchlist.map((stock) => (
           <WatchListItem
             key={stock.name}
@@ -174,8 +203,12 @@ export default function WatchList() {
         ))}
       </ul>
 
-      {/* Chart */}
-      <DoughnutChart data={data} />
+      <div className="bg-white dark:bg-gray-900 rounded-xl p-4 border border-gray-200 dark:border-gray-700 shadow-sm">
+        <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">
+          Portfolio Distribution
+        </h4>
+        <DoughnutChart data={data} />
+      </div>
     </aside>
   );
 }

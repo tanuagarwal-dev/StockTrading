@@ -387,6 +387,7 @@ app.post("/auth/login", async (req, res) => {
 // });
 
 // Protected portfolio & order routes
+
 app.get("/allHoldings", authMiddleware, async (req, res) => {
   const allHoldings = await HoldingsModel.find({ user: req.userId });
   res.json(allHoldings);

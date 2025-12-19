@@ -6,7 +6,6 @@ export default function Funds() {
     <>
       <Menu />
       <section className="space-y-10 p-4">
-        {/* Top Actions */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 rounded-md border p-4 bg-white">
           <p className="text-sm text-gray-700">
             Instant, zero-cost fund transfers with UPI
@@ -29,9 +28,7 @@ export default function Funds() {
           </div>
         </div>
 
-        {/* Main Content */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Equity */}
           <div className="rounded-md border bg-white p-5 space-y-4">
             <p className="text-sm font-semibold text-gray-700">Equity</p>
 
@@ -58,7 +55,6 @@ export default function Funds() {
             </div>
           </div>
 
-          {/* Commodity */}
           <div className="rounded-md border bg-white p-5 flex flex-col justify-between">
             <p className="text-sm text-gray-600">
               You don&apos;t have a commodity account

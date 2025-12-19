@@ -1,7 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
 import Menu from "@/components/dashboard/Menu";
-// import { positions } from "@/lib/dashboardData";
 import apiClient from "@/lib/apiClient";
 
 type Position = {
@@ -15,36 +14,34 @@ type Position = {
 };
 
 export default function Positions() {
-    const [allPositions, setAllPositions] = useState<Position[]>([]);
-  
-    useEffect(() => {
-      apiClient.get("/allPositions").then((res) => {
-        setAllPositions(res.data);
-      });
-    }, []);
-  
-    const labels = allPositions.map((h) => h.name);
-  
-    const data = {
-      labels,
-      datasets: [
-        {
-          label: "Stock Price",
-          data: allPositions.map((h) => h.price),
-          backgroundColor: "rgba(59,130,246,0.6)", // Tailwind blue
-        },
-      ],
-    };
+  const [allPositions, setAllPositions] = useState<Position[]>([]);
+
+  useEffect(() => {
+    apiClient.get("/allPositions").then((res) => {
+      setAllPositions(res.data);
+    });
+  }, []);
+
+  const labels = allPositions.map((h) => h.name);
+
+  const data = {
+    labels,
+    datasets: [
+      {
+        label: "Stock Price",
+        data: allPositions.map((h) => h.price),
+        backgroundColor: "rgba(59,130,246,0.6)", // Tailwind blue
+      },
+    ],
+  };
   return (
     <>
       <Menu />
       <section className="space-y-6 p-4">
-        {/* Title */}
         <h3 className="text-lg font-semibold">
           Positions ({allPositions.length})
         </h3>
 
-        {/* Table */}
         <div className="overflow-x-auto rounded-md border">
           <table className="w-full text-sm text-left">
             <thead className="bg-gray-50 text-gray-600">

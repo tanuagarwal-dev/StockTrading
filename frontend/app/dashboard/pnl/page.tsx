@@ -47,9 +47,7 @@ export default function PnlReportPage() {
         setHoldings(holdingsRes.data);
         setOrders(ordersRes.data);
       })
-      .catch(() => {
-        // keep silent for now; page can show zeros on failure
-      });
+      .catch(() => {});
   };
 
   useEffect(() => {
@@ -75,7 +73,6 @@ export default function PnlReportPage() {
 
     const start = new Date(startDate);
     const end = new Date(endDate);
-    // include full end day
     end.setHours(23, 59, 59, 999);
 
     return orders.reduce((sum, o) => {
@@ -115,7 +112,6 @@ export default function PnlReportPage() {
     <>
       <Menu />
       <section className="space-y-6 p-4">
-        {/* Header & filters */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
             <h3 className="text-lg font-semibold">P&amp;L Report</h3>
@@ -147,7 +143,6 @@ export default function PnlReportPage() {
           </div>
         </div>
 
-        {/* Summary cards */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 text-sm">
           <div>
             <p className="text-gray-500">Realized P&amp;L (range)</p>
@@ -174,5 +169,3 @@ export default function PnlReportPage() {
     </>
   );
 }
-
-

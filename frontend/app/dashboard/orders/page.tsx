@@ -16,44 +16,44 @@ type Order = {
   rejectionReason?: string;
 };
 export default function Orders() {
-    const [allOrders, setAllOrders] = useState<Order[]>([]);
+  const [allOrders, setAllOrders] = useState<Order[]>([]);
 
-    const fetchOrders = () => {
-      apiClient.get("/allOrders").then((res) => {
-        setAllOrders(res.data);
-      });
-    };
+  const fetchOrders = () => {
+    apiClient.get("/allOrders").then((res) => {
+      setAllOrders(res.data);
+    });
+  };
 
-    useEffect(() => {
+  useEffect(() => {
+    fetchOrders();
+
+    const handler = () => {
       fetchOrders();
-
-      const handler = () => {
-        fetchOrders();
-      };
-
-      if (typeof window !== "undefined") {
-        window.addEventListener("portfolio-updated", handler);
-      }
-
-      return () => {
-        if (typeof window !== "undefined") {
-          window.removeEventListener("portfolio-updated", handler);
-        }
-      };
-    }, []);
-
-    const labels = allOrders.map((h) => h.name);
-
-    const data = {
-      labels,
-      datasets: [
-        {
-          label: "Stock Price",
-          data: allOrders.map((h) => h.price),
-          backgroundColor: "rgba(59,130,246,0.6)", // Tailwind blue
-        },
-      ],
     };
+
+    if (typeof window !== "undefined") {
+      window.addEventListener("portfolio-updated", handler);
+    }
+
+    return () => {
+      if (typeof window !== "undefined") {
+        window.removeEventListener("portfolio-updated", handler);
+      }
+    };
+  }, []);
+
+  const labels = allOrders.map((h) => h.name);
+
+  const data = {
+    labels,
+    datasets: [
+      {
+        label: "Stock Price",
+        data: allOrders.map((h) => h.price),
+        backgroundColor: "rgba(59,130,246,0.6)", // Tailwind blue
+      },
+    ],
+  };
   return (
     <>
       <Menu />
@@ -76,7 +76,6 @@ export default function Orders() {
         <div className="space-y-6 p-4">
           <h3 className="text-lg font-semibold">Orders ({allOrders.length})</h3>
 
-          {/* Table */}
           <div className="overflow-x-auto rounded-md border">
             <table className="w-full text-sm text-left">
               <thead className="bg-gray-50 text-gray-600">

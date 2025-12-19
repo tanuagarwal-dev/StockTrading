@@ -29,7 +29,6 @@ export default function BuyActionWindow({ uid, mode }: Props) {
         mode,
         orderType,
       });
-      // let other parts of the app know portfolio has changed
       if (typeof window !== "undefined") {
         window.dispatchEvent(new Event("portfolio-updated"));
       }
@@ -43,12 +42,10 @@ export default function BuyActionWindow({ uid, mode }: Props) {
 
   return (
     <div className="fixed inset-0 z-50 bg-black/40 text-black flex items-end justify-center">
-      {/* Window */}
       <div
         draggable
         className="relative w-[40%] h-[63%] bg-[#f5f5f5] border border-[#eee] rounded-md shadow-lg cursor-move"
       >
-        {/* Header */}
         <div className="bg-[#4184f3] px-4 py-3 rounded-t-md">
           <h3 className=" text-base font-medium">
             {isBuy ? "Buy" : "Sell"} {uid}{" "}
@@ -59,11 +56,8 @@ export default function BuyActionWindow({ uid, mode }: Props) {
           </p>
         </div>
 
-        {/* Body */}
         <div className="bg-white px-6 py-5 h-[calc(100%-120px)]">
-          {/* Inputs */}
           <div className="flex gap-4 mt-4">
-            {/* Qty */}
             <fieldset className="border border-gray-300 px-3 py-1 w-[120px]">
               <legend className="text-xs px-1 text-gray-700">Qty.</legend>
               <input
@@ -76,7 +70,6 @@ export default function BuyActionWindow({ uid, mode }: Props) {
               />
             </fieldset>
 
-            {/* Price */}
             <fieldset className="border border-gray-300 px-3 py-1 w-[120px]">
               <legend className="text-xs px-1 text-gray-400">Price</legend>
               <input
@@ -89,8 +82,7 @@ export default function BuyActionWindow({ uid, mode }: Props) {
               />
             </fieldset>
 
-            {/* Order type */}
-            <fieldset className="border border-gray-300 px-3 py-1 w-[140px]">
+            <fieldset className="border border-gray-300 px-3 py-1 w-35">
               <legend className="text-xs px-1 text-gray-700">Order type</legend>
               <select
                 value={orderType}
@@ -106,7 +98,6 @@ export default function BuyActionWindow({ uid, mode }: Props) {
           </div>
         </div>
 
-        {/* Footer */}
         <div className="absolute bottom-4 left-0 w-full px-6 flex justify-between items-center">
           <span className="text-xs text-gray-600">Delivery only</span>
 
