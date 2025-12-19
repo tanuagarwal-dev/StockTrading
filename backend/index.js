@@ -149,9 +149,9 @@ const authMiddleware = (req, res, next) => {
 // Auth routes
 app.post("/auth/register", async (req, res) => {
   try {
-    const { email, password } = req.body;
-    if (!email || !password) {
-      return res.status(400).json({ message: "Email and password are required" });
+    const { name, email, password } = req.body;
+    if (!name || !email || !password) {
+      return res.status(400).json({ message: "All fields are required" });
     }
 
     const existing = await UserModel.findOne({ email: email.toLowerCase() });
@@ -162,8 +162,13 @@ app.post("/auth/register", async (req, res) => {
     const passwordHash = await bcrypt.hash(password, 10);
 
     const user = await UserModel.create({
+      name,
       email: email.toLowerCase(),
       passwordHash,
+      funds: {
+        available: 0,
+        used: 0,
+      },
     });
 
     const token = jwt.sign({ userId: user._id }, JWT_SECRET, {
@@ -175,6 +180,7 @@ app.post("/auth/register", async (req, res) => {
       user: {
         id: user._id,
         email: user.email,
+        name: user.name,
       },
     });
   } catch (err) {
@@ -209,6 +215,9 @@ app.post("/auth/login", async (req, res) => {
       user: {
         id: user._id,
         email: user.email,
+        name: user.name,
+        funds: user.funds,
+        role: user.role,
       },
     });
   } catch (err) {
@@ -216,6 +225,24 @@ app.post("/auth/login", async (req, res) => {
     return res.status(500).json({ message: "Internal server error" });
   }
 });
+
+app.get("/auth/me", authMiddleware, async (req, res) => {
+  try {
+    const user = await UserModel.findById(req.userId).select(
+      "name email funds role createdAt"
+    );
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.json(user);
+  } catch (err) {
+    console.error("Me error", err);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
 
 // app.get("/addHoldings", async (req, res) => {
 //   let tempHoldings = [
