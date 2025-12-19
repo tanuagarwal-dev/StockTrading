@@ -15,45 +15,55 @@ type Order = {
   realizedPnl?: number;
   rejectionReason?: string;
 };
+type Meta = {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+};
 export default function Orders() {
   const [allOrders, setAllOrders] = useState<Order[]>([]);
+  const [meta, setMeta] = useState<Meta>({ page: 1, limit: 20, total: 0, totalPages: 0 });
+   const [page, setPage] = useState(1);
+   const LIMIT = 10;
 
-  const fetchOrders = () => {
-    apiClient.get("/allOrders").then((res) => {
-      setAllOrders(res.data);
+  const fetchOrders = (pageNum = page) => {
+    try {
+      apiClient.get("/orders",
+       { params: { page: pageNum, limit: LIMIT } }
+    ).then((res) => {
+      setAllOrders(res.data.data);
+      setMeta(res.data.meta);
     });
+    } catch (error) {
+      console.error("Failed to fetch orders:", error);
+    }
   };
 
-  useEffect(() => {
-    fetchOrders();
+   useEffect(() => {
+    fetchOrders(page);
 
-    const handler = () => {
-      fetchOrders();
-    };
-
-    if (typeof window !== "undefined") {
-      window.addEventListener("portfolio-updated", handler);
-    }
+    const handler = () => fetchOrders(page);
+    window.addEventListener("portfolio-updated", handler);
 
     return () => {
-      if (typeof window !== "undefined") {
-        window.removeEventListener("portfolio-updated", handler);
-      }
+      window.removeEventListener("portfolio-updated", handler);
     };
-  }, []);
+  }, [page])
 
-  const labels = allOrders.map((h) => h.name);
 
-  const data = {
-    labels,
-    datasets: [
-      {
-        label: "Stock Price",
-        data: allOrders.map((h) => h.price),
-        backgroundColor: "rgba(59,130,246,0.6)", // Tailwind blue
-      },
-    ],
-  };
+  // const labels = allOrders.map((h) => h.name);
+
+  // const data = {
+  //   labels,
+  //   datasets: [
+  //     {
+  //       label: "Stock Price",
+  //       data: allOrders.map((h) => h.price),
+  //       backgroundColor: "rgba(59,130,246,0.6)", // Tailwind blue
+  //     },
+  //   ],
+  // };
   return (
     <>
       <Menu />
@@ -121,6 +131,30 @@ export default function Orders() {
               </tbody>
             </table>
           </div>
+          {/* Pagination */}
+          {meta && meta.totalPages > 1 && (
+            <div className="flex items-center justify-end gap-4">
+              <button
+                disabled={meta.page === 1}
+                onClick={() => setPage((p) => p - 1)}
+                className="px-3 py-1 border rounded disabled:opacity-50"
+              >
+                Prev
+              </button>
+
+              <span className="text-sm text-gray-600">
+                Page {meta.page} of {meta.totalPages}
+              </span>
+
+              <button
+                disabled={meta.page === meta.totalPages}
+                onClick={() => setPage((p) => p + 1)}
+                className="px-3 py-1 border rounded disabled:opacity-50"
+              >
+                Next
+              </button>
+            </div>
+          )}
         </div>
       )}
     </>

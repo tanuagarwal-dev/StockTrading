@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
 import GeneralContext from "@/context/GeneralContext";
 import apiClient from "@/lib/apiClient";
+import { useUser } from "@/context/UserContext";
 
 type Side = "BUY" | "SELL";
 
@@ -13,31 +14,52 @@ type Props = {
 
 export default function BuyActionWindow({ uid, mode }: Props) {
   const { closeBuyWindow } = useContext(GeneralContext);
-
+  const [error, setError] = useState<string | null>(null);
+const { refreshUser } = useUser()
   const [stockQuantity, setStockQuantity] = useState<number>(1);
   const [stockPrice, setStockPrice] = useState<number>(1);
   const [orderType, setOrderType] = useState<"MARKET" | "LIMIT">("MARKET");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+
   const handleSubmit = async () => {
-    setIsSubmitting(true);
+  if (isSubmitting) return;
+  setError(null);
+  setIsSubmitting(true);
     try {
+      // await apiClient.post("/newOrder", {
+      //   name: uid,
+      //   qty: stockQuantity,
+      //   price: stockPrice,
+      //   mode,
+      //   orderType,
+      // });
       await apiClient.post("/newOrder", {
         name: uid,
         qty: stockQuantity,
-        price: stockPrice,
         mode,
         orderType,
+        ...(orderType === "LIMIT" ? { price: stockPrice } : {}),
       });
+
       if (typeof window !== "undefined") {
         window.dispatchEvent(new Event("portfolio-updated"));
       }
+      await refreshUser();
       closeBuyWindow();
+    } catch(err:any) { 
+      setError(err?.response?.data?.message || "Order failed");
     } finally {
       setIsSubmitting(false);
     }
   };
+  
 
+  useEffect(() => {
+    if (orderType === "MARKET") {
+      setStockPrice(0);
+    }
+  }, [orderType]);
   const isBuy = mode === "BUY";
 
   return (
@@ -58,7 +80,7 @@ export default function BuyActionWindow({ uid, mode }: Props) {
 
         <div className="bg-white px-6 py-5 h-[calc(100%-120px)]">
           <div className="flex gap-4 mt-4">
-            <fieldset className="border border-gray-300 px-3 py-1 w-[120px]">
+            <fieldset className="border border-gray-300 px-3 py-1 w-30">
               <legend className="text-xs px-1 text-gray-700">Qty.</legend>
               <input
                 title="quantity"
@@ -70,12 +92,13 @@ export default function BuyActionWindow({ uid, mode }: Props) {
               />
             </fieldset>
 
-            <fieldset className="border border-gray-300 px-3 py-1 w-[120px]">
+            <fieldset className="border border-gray-300 px-3 py-1 w-30">
               <legend className="text-xs px-1 text-gray-400">Price</legend>
               <input
                 title="price"
                 type="number"
                 step="0.05"
+                disabled={orderType === "MARKET"}
                 value={stockPrice}
                 onChange={(e) => setStockPrice(Number(e.target.value))}
                 className="w-full text-lg outline-none"
@@ -85,6 +108,7 @@ export default function BuyActionWindow({ uid, mode }: Props) {
             <fieldset className="border border-gray-300 px-3 py-1 w-35">
               <legend className="text-xs px-1 text-gray-700">Order type</legend>
               <select
+                title="order-type"
                 value={orderType}
                 onChange={(e) =>
                   setOrderType(e.target.value as "MARKET" | "LIMIT")
@@ -97,6 +121,7 @@ export default function BuyActionWindow({ uid, mode }: Props) {
             </fieldset>
           </div>
         </div>
+        {error && <div className="text-xs text-red-600 mt-2">{error}</div>}
 
         <div className="absolute bottom-4 left-0 w-full px-6 flex justify-between items-center">
           <span className="text-xs text-gray-600">Delivery only</span>

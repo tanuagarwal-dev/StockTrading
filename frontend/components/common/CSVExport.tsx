@@ -50,7 +50,7 @@ export default function CSVExport<T extends object>({
   return (
     <button
       onClick={downloadCSV}
-      className="px-3 py-1.5 text-sm rounded bg-blue-600 text-white hover:bg-blue-700"
+      className="m-4 px-3 py-1.5 text-sm rounded bg-blue-600 text-white hover:bg-blue-700"
       disabled={!data.length}
     >
       Export CSV

@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import VerticalGraph from "../../../charts/VerticalGraph";
 import Menu from "@/components/dashboard/Menu";
 import apiClient from "@/lib/apiClient";
 import CSVExport from "@/components/common/CSVExport";
+import GeneralContext from "@/context/GeneralContext";
 
 type Holding = {
   name: string;
@@ -19,6 +20,8 @@ type Holding = {
 export default function Holdings() {
   const [allHoldings, setAllHoldings] = useState<Holding[]>([]);
   const [livePrices, setLivePrices] = useState<Record<string, number>>({});
+  const { selectedStock, openBuyWindow, openSellWindow } =
+    useContext(GeneralContext);
 
   const fetchHoldings = () => {
     apiClient.get("/allHoldings").then((res) => {
@@ -114,6 +117,8 @@ export default function Holdings() {
                 <th className="px-3 py-2">P&amp;L</th>
                 <th className="px-3 py-2">Net chg.</th>
                 <th className="px-3 py-2">Day chg.</th>
+                <th className="px-3 py-2">Sell</th>
+                <th className="px-3 py-2">Buy More</th>
               </tr>
             </thead>
 
@@ -142,6 +147,22 @@ export default function Holdings() {
                     </td>
                     <td className={`px-3 py-2 ${profitClass}`}>{stock.net}</td>
                     <td className={`px-3 py-2 ${dayClass}`}>{stock.day}</td>
+                    <td className="px-3 py-2">
+                      <button
+                        onClick={() => openSellWindow(stock.name)}
+                        className="flex-1 sm:flex-none rounded-lg text-red-600 hover:text-red-700 font-semibold text-sm md:text-base transition duration-200 transform hover:scale-105"
+                      >
+                        SELL
+                      </button>
+                    </td>
+                    <td className="px-3 py-2">
+                      <button
+                        onClick={() => openBuyWindow(stock.name)}
+                        className="flex-1 sm:flex-none font-semibold rounded-lg text-green-600 hover:text-green-700 text-sm md:text-base shadow-lg transition duration-200 transform hover:scale-105"
+                      >
+                        BUY
+                      </button>
+                    </td>
                   </tr>
                 );
               })}

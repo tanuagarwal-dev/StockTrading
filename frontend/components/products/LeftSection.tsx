@@ -55,7 +55,7 @@ const LeftSection = ({
           </div>
 
           <div className="flex items-center gap-12 mt-6">
-            <a href={googlePlay} target="_blank" rel="noopener noreferrer">
+            <Link href={googlePlay} target="_blank" rel="noopener noreferrer">
               <Image
                 src="/media/images/googlePlayBadge.svg"
                 alt="Google Play"
@@ -64,9 +64,9 @@ const LeftSection = ({
                 sizes="135px"
                 className="h-12"
               />
-            </a>
+            </Link>
 
-            <a href={appStore} target="_blank" rel="noopener noreferrer">
+            <Link href={appStore} target="_blank" rel="noopener noreferrer">
               <Image
                 src="/media/images/appstoreBadge.svg"
                 alt="App Store"
@@ -75,7 +75,7 @@ const LeftSection = ({
                 sizes="135px"
                 className="h-12"
               />
-            </a>
+            </Link>
           </div>
         </div>
       </div>

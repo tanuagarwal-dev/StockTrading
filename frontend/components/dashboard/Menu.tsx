@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
+import { useUser } from "@/context/UserContext";
 
 const tabs = [
   { label: "Summary", href: "/dashboard" },
@@ -11,12 +12,13 @@ const tabs = [
   { label: "Trades", href: "/dashboard/trades" },
   { label: "OHLC", href: "/dashboard/ohlc" },
   { label: "Funds", href: "/dashboard/funds" },
+  { label: "Shares", href: "/dashboard/shares" },
   { label: "Apps", href: "/dashboard/apps" },
 ];
 
 export default function Menu() {
   const pathname = usePathname();
-
+  const { logout } = useUser()
   return (
     <div className="lg:h-20 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm">
       <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between px-4 lg:px-6">
@@ -32,6 +34,14 @@ export default function Menu() {
           <div className="flex items-center gap-2 lg:hidden">
             <div className="w-8 h-8 rounded-full bg-linear-to-br from-blue-600 to-indigo-600 dark:from-blue-500 dark:to-indigo-500 text-white flex items-center justify-center text-xs font-bold shadow-md">
               ZU
+            </div>
+            <div className="text-sm font-semibold text-gray-900 dark:text-white">
+              <button
+                onClick={logout}
+                className="text-xs text-red-600 hover:underline"
+              >
+                Logout
+              </button>
             </div>
           </div>
         </div>
@@ -60,9 +70,14 @@ export default function Menu() {
             <div className="w-9 h-9 rounded-full bg-linear-to-br from-blue-600 to-indigo-600 dark:from-blue-500 dark:to-indigo-500 text-white flex items-center justify-center text-sm font-bold shadow-md">
               ZU
             </div>
-            <span className="text-sm font-semibold text-gray-900 dark:text-white">
-              USERID
-            </span>
+            <div className="text-sm font-semibold text-gray-900 dark:text-white">
+              <button
+                onClick={logout}
+                className="text-xs text-red-600 hover:underline"
+              >
+                Logout
+              </button>
+            </div>
           </div>
         </div>
 
