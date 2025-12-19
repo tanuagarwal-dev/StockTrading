@@ -1,79 +1,78 @@
+"use client";
+
 import Menu from "@/components/dashboard/Menu";
-import Link from "next/link";
+import { useUser } from "@/context/UserContext";
+import { useState } from "react";
+import FundsModal from "@/components/dashboard/FundsModal";
 
 export default function Funds() {
+  const { user } = useUser();
+  const [modal, setModal] = useState<"ADD" | "WITHDRAW" | null>(null);
+
+  if (!user) return null;
+
+  const available = user.funds.available;
+  const used = user.funds.used;
+  const total = available + used; // opening & live (simulator)
+
   return (
     <>
       <Menu />
+
+      {modal && <FundsModal type={modal} onClose={() => setModal(null)} />}
+
       <section className="space-y-10 p-4">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 rounded-md border p-4 bg-white">
+        <div className="flex justify-between items-center border p-4 bg-white rounded">
           <p className="text-sm text-gray-700">
-            Instant, zero-cost fund transfers with UPI
+            Instant, zero-cost fund transfers (mock)
           </p>
 
           <div className="flex gap-3">
-            <Link
-              href="#"
-              className="rounded-md bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-700 transition"
+            <button
+              onClick={() => setModal("ADD")}
+              className="bg-green-600 text-white px-4 py-2 rounded text-sm"
             >
               Add funds
-            </Link>
-
-            <Link
-              href="#"
-              className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 transition"
+            </button>
+            <button
+              onClick={() => setModal("WITHDRAW")}
+              className="bg-blue-600 text-white px-4 py-2 rounded text-sm"
             >
               Withdraw
-            </Link>
+            </button>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <div className="rounded-md border bg-white p-5 space-y-4">
-            <p className="text-sm font-semibold text-gray-700">Equity</p>
+        <div className="rounded-md border bg-white p-5 space-y-4">
+          <p className="text-sm font-semibold text-gray-700">Equity</p>
 
-            <div className="space-y-3 text-sm">
-              <Row label="Available margin" value="4,043.10" highlight />
-              <Row label="Used margin" value="3,757.30" />
-              <Row label="Available cash" value="4,043.10" />
+          <Row
+            label="Available margin"
+            value={available.toFixed(2)}
+            highlight
+          />
+          <Row label="Used margin" value={used.toFixed(2)} />
+          <Row label="Available cash" value={available.toFixed(2)} />
 
-              <hr />
+          <hr />
 
-              <Row label="Opening balance" value="4,043.10" />
-              <Row label="Live balance" value="3,736.40" />
-              <Row label="Payin" value="4,064.00" />
-              <Row label="SPAN" value="0.00" />
-              <Row label="Delivery margin" value="0.00" />
-              <Row label="Exposure" value="0.00" />
-              <Row label="Options premium" value="0.00" />
+          <Row label="Opening balance" value={total.toFixed(2)} />
+          <Row label="Live balance" value={total.toFixed(2)} />
+          <Row label="Payin" value="—" />
+          <Row label="SPAN" value="0.00" />
+          <Row label="Delivery margin" value={used.toFixed(2)} />
+          <Row label="Exposure" value={used.toFixed(2)} />
+          <Row label="Options premium" value="0.00" />
 
-              <hr />
+          <hr />
 
-              <Row label="Collateral (Liquid funds)" value="0.00" />
-              <Row label="Collateral (Equity)" value="0.00" />
-              <Row label="Total Collateral" value="0.00" />
-            </div>
-          </div>
-
-          <div className="rounded-md border bg-white p-5 flex flex-col justify-between">
-            <p className="text-sm text-gray-600">
-              You don&apos;t have a commodity account
-            </p>
-
-            <Link
-              href="/signup"
-              className="mt-4 inline-block rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 transition w-fit"
-            >
-              Open Account
-            </Link>
-          </div>
+          <Row label="Total collateral" value="0.00" />
         </div>
       </section>
     </>
   );
 }
 
-/* Reusable row */
 function Row({
   label,
   value,
@@ -84,15 +83,15 @@ function Row({
   highlight?: boolean;
 }) {
   return (
-    <div className="flex justify-between items-center p-2">
-      <p className="text-gray-600">{label}</p>
-      <p
-        className={`font-medium ${
+    <div className="flex justify-between p-2">
+      <span className="text-gray-600 text-sm">{label}</span>
+      <span
+        className={`text-sm font-medium ${
           highlight ? "text-green-600" : "text-gray-900"
         }`}
       >
         {value}
-      </p>
+      </span>
     </div>
   );
 }
