@@ -236,12 +236,53 @@ app.get("/auth/me", authMiddleware, async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    res.json(user);
+    res.json({
+      id: user._id,
+      name: user.name,
+      email: user.email,
+      funds: user.funds,
+      role: user.role,
+    });
   } catch (err) {
     console.error("Me error", err);
     res.status(500).json({ message: "Internal server error" });
   }
 });
+
+app.post("/funds/add", authMiddleware, async (req, res) => {
+  const { amount } = req.body;
+
+  if (!amount || amount <= 0) {
+    return res.status(400).json({ message: "Invalid amount" });
+  }
+
+  const user = await UserModel.findById(req.userId);
+  user.funds.available += Number(amount);
+
+  await user.save();
+  res.json({ funds: user.funds });
+});
+
+app.post("/funds/withdraw", authMiddleware, async (req, res) => {
+  const { amount } = req.body;
+
+  if (!amount || amount <= 0) {
+    return res.status(400).json({ message: "Invalid amount" });
+  }
+
+  const user = await UserModel.findById(req.userId);
+
+  if (user.funds.available < amount) {
+    return res.status(400).json({ message: "Insufficient balance" });
+  }
+
+  user.funds.available -= Number(amount);
+  await user.save();
+
+  res.json({ funds: user.funds });
+});
+
+
 
 
 // app.get("/addHoldings", async (req, res) => {
@@ -430,7 +471,34 @@ app.get("/allOrders", authMiddleware, async (req, res) => {
   res.json(allOrders);
 });
 
-app.get("/executedOrders", authMiddleware, async (req, res) => {
+app.get("/orders", authMiddleware, async (req, res) => {
+  const page = Math.max(1, Number(req.query.page) || 1);
+  const limit = Math.min(50, Number(req.query.limit) || 20);
+  const status = req.query.status; // optional
+
+  const query = { user: req.userId };
+  if (status) query.status = status;
+
+  const total = await OrdersModel.countDocuments(query);
+
+  const orders = await OrdersModel.find(query)
+    .sort({ createdAt: -1 }) // newest first
+    .skip((page - 1) * limit)
+    .limit(limit);
+
+  res.json({
+    data: orders,
+    meta: {
+      page,
+      limit,
+      total,
+      totalPages: Math.ceil(total / limit),
+    },
+  });
+});
+
+app.get("/allExecutedOrders", authMiddleware, async (req, res) => {
+  
   const executed = await OrdersModel.find({
     user: req.userId,
     status: "EXECUTED",
@@ -440,6 +508,34 @@ app.get("/executedOrders", authMiddleware, async (req, res) => {
   res.json(executed);
 });
 
+app.get("/executedOrders", authMiddleware, async (req, res) => {
+  try {
+    const page = Math.max(1, Number(req.query.page) || 1);
+    const limit = Math.min(50, Number(req.query.limit) || 20);
+
+    const query = { user: req.userId, status: "EXECUTED" };
+
+    const total = await OrdersModel.countDocuments(query);
+
+    const orders = await OrdersModel.find(query)
+      .sort({ createdAt: -1 })
+      .skip((page - 1) * limit)
+      .limit(limit);
+
+    res.json({
+      data: orders,
+      meta: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+      },
+    });
+  } catch (err) {
+    console.error("Executed orders error", err);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
 // Read-only price APIs
 app.get("/prices", (req, res) => {
   res.json(simulatedPrices);
@@ -470,41 +566,201 @@ app.get("/ohlc/:symbol", (req, res) => {
   res.json(candles);
 });
 
-app.post("/newOrder", authMiddleware, async (req, res) => {
+// app.post("/newOrder", authMiddleware, async (req, res) => {
+//   try {
+//     const { name, qty, price, mode, orderType: rawOrderType } = req.body;
+//     if (!name || !qty || !price || !mode) {
+//       return res
+//         .status(400)
+//         .json({ message: "name, qty, price and mode are required" });
+//     }
+//     const user = await UserModel.findById(req.userId);
+//     const cost = price * qty;
+
+//     if (user.funds.available < cost) {
+//       return res
+//         .status(501)
+//         .json({ message: "Insufficient funds" });
+//     } else {
+//       user.funds.available -= cost;
+//       user.funds.used += cost;
+//       await user.save();
+
+//       const side = mode === "SELL" ? "SELL" : "BUY";
+//       const orderType =
+//         rawOrderType === "LIMIT" || rawOrderType === "MARKET"
+//           ? rawOrderType
+//           : "MARKET";
+
+//       const quantity = Number(qty);
+//       const requestedPrice = Number(price);
+
+//       if (!Number.isFinite(quantity) || quantity <= 0) {
+//         return res.status(400).json({ message: "Invalid quantity" });
+//       }
+
+//       if (!Number.isFinite(requestedPrice) || requestedPrice <= 0) {
+//         return res.status(400).json({ message: "Invalid price" });
+//       }
+
+//       const currentPrice = getCurrentPriceForSymbol(name);
+
+//       let status = "REJECTED";
+//       let executedPrice = null;
+//       let realizedPnl = 0;
+//       let rejectionReason = "";
+//       if (orderType === "MARKET") {
+//         status = "EXECUTED";
+//         executedPrice = currentPrice;
+//       } else {
+//         if (side === "BUY" && currentPrice <= requestedPrice) {
+//           status = "EXECUTED";
+//           executedPrice = requestedPrice;
+//         } else if (side === "SELL" && currentPrice >= requestedPrice) {
+//           status = "EXECUTED";
+//           executedPrice = requestedPrice;
+//         } else {
+//           status = "REJECTED";
+//           rejectionReason = "Limit price not met";
+//         }
+//       }
+
+//       if (status === "EXECUTED") {
+//         const execPrice = executedPrice;
+
+//         if (side === "BUY") {
+          
+//           let holding = await HoldingsModel.findOne({
+//             user: req.userId,
+//             name,
+//           });
+
+//           if (!holding) {
+//             holding = new HoldingsModel({
+//               user: req.userId,
+//               name,
+//               qty: quantity,
+//               avg: execPrice,
+//               price: execPrice,
+//               net: "0%",
+//               day: "0%",
+//             });
+//           } else {
+//             const existingQty = holding.qty ?? 0;
+//             const existingAvg = holding.avg ?? execPrice;
+//             const newQty = existingQty + quantity;
+//             const newAvg =
+//               (existingAvg * existingQty + execPrice * quantity) / newQty;
+
+//             holding.qty = newQty;
+//             holding.avg = newAvg;
+//             holding.price = execPrice;
+//           }
+
+//           await holding.save();
+//           realizedPnl = 0;
+//         } else {
+//           // SELL: reduce holding qty and compute realized P&L
+//           const holding = await HoldingsModel.findOne({
+//             user: req.userId,
+//             name,
+//           });
+
+//           if (!holding || (holding.qty ?? 0) < quantity) {
+//             status = "REJECTED";
+//             rejectionReason = "Insufficient quantity to sell";
+//           } else {
+//             const existingQty = holding.qty;
+//             const existingAvg = holding.avg ?? execPrice;
+
+//             realizedPnl = (execPrice - existingAvg) * quantity;
+
+//             const newQty = existingQty - quantity;
+
+//             if (newQty > 0) {
+//               holding.qty = newQty;
+//               holding.price = execPrice;
+//               await holding.save();
+//             } else {
+              
+//               await holding.deleteOne();
+//             }
+//           }
+//         }
+//       }
+
+//       const orderDoc = new OrdersModel({
+//         user: req.userId,
+//         name,
+//         qty: quantity,
+//         price: requestedPrice,
+//         mode: side,
+//         orderType,
+//         status,
+//         executedPrice,
+//         realizedPnl,
+//         rejectionReason,
+//       });
+
+//       await orderDoc.save();
+
+//       return res.json(orderDoc);
+//     }
+//   } catch (err) {
+//     console.error("New order error", err);
+//     return res.status(500).json({ message: "Internal server error" });
+//   }
+// });
+
+app.post("/newOrder1", authMiddleware, async (req, res) => {
   try {
     const { name, qty, price, mode, orderType: rawOrderType } = req.body;
 
-    if (!name || !qty || !price || !mode) {
+    // ---------- Basic validation ----------
+    if (!name || !qty || !mode ) {
       return res
         .status(400)
-        .json({ message: "name, qty, price and mode are required" });
+        .json({ message: "name, qty and mode are required" });
+    }
+      const orderType =
+        rawOrderType === "LIMIT" || rawOrderType === "MARKET"
+          ? rawOrderType
+          : "MARKET";
+
+    if (orderType === "LIMIT" && (!price || price <= 0)) {
+      return res.status(400).json({ message: "Valid limit price required" });
+    }
+    const quantity = Number(qty);
+   
+    const requestedPrice = orderType === "LIMIT" ? Number(price) : null;
+
+    if (orderType === "LIMIT") {
+      if (!Number.isFinite(requestedPrice) || requestedPrice <= 0) {
+        return res.status(400).json({ message: "Invalid limit price" });
+      }
     }
 
-    const side = mode === "SELL" ? "SELL" : "BUY";
-    const orderType =
-      rawOrderType === "LIMIT" || rawOrderType === "MARKET"
-        ? rawOrderType
-        : "MARKET";
-
-    const quantity = Number(qty);
-    const requestedPrice = Number(price);
 
     if (!Number.isFinite(quantity) || quantity <= 0) {
       return res.status(400).json({ message: "Invalid quantity" });
     }
 
-    if (!Number.isFinite(requestedPrice) || requestedPrice <= 0) {
-      return res.status(400).json({ message: "Invalid price" });
-    }
+    // if (!Number.isFinite(requestedPrice) || requestedPrice <= 0) {
+    //   return res.status(400).json({ message: "Invalid price" });
+    // }
+
+    const side = mode === "SELL" ? "SELL" : "BUY";
+  
 
     const currentPrice = getCurrentPriceForSymbol(name);
 
+    // ---------- Initial order state ----------
     let status = "REJECTED";
     let executedPrice = null;
     let realizedPnl = 0;
     let rejectionReason = "";
 
-    // Decide execution price & status
+    // ---------- Decide execution ----------
     if (orderType === "MARKET") {
       status = "EXECUTED";
       executedPrice = currentPrice;
@@ -522,71 +778,90 @@ app.post("/newOrder", authMiddleware, async (req, res) => {
       }
     }
 
-    // If EXECUTED, update holdings (delivery only)
+    // ---------- Fetch user ----------
+    const user = await UserModel.findById(req.userId);
+    if (!user) {
+      return res.status(401).json({ message: "User not found" });
+    }
+
+    // ---------- Execute effects ----------
     if (status === "EXECUTED") {
       const execPrice = executedPrice;
 
+      // ===== BUY =====
       if (side === "BUY") {
-        // BUY: increase or create holding, recalc avg price
-        let holding = await HoldingsModel.findOne({
-          user: req.userId,
-          name,
-        });
+        const cost = execPrice * quantity;
 
-        if (!holding) {
-          holding = new HoldingsModel({
+        if (user.funds.available < cost) {
+          status = "REJECTED";
+          rejectionReason = "Insufficient funds";
+        } else {
+          // Deduct funds
+          user.funds.available -= cost;
+          user.funds.used += cost;
+          await user.save();
+
+          // Update holdings
+          let holding = await HoldingsModel.findOne({
             user: req.userId,
             name,
-            qty: quantity,
-            avg: execPrice,
-            price: execPrice,
-            net: "0%",
-            day: "0%",
           });
-        } else {
-          const existingQty = holding.qty ?? 0;
-          const existingAvg = holding.avg ?? execPrice;
-          const newQty = existingQty + quantity;
-          const newAvg =
-            (existingAvg * existingQty + execPrice * quantity) / newQty;
 
-          holding.qty = newQty;
-          holding.avg = newAvg;
-          holding.price = execPrice;
+          if (!holding) {
+            holding = new HoldingsModel({
+              user: req.userId,
+              name,
+              qty: quantity,
+              avg: execPrice,
+              price: execPrice,
+              net: "0%",
+              day: "0%",
+            });
+          } else {
+            const newQty = holding.qty + quantity;
+            holding.avg =
+              (holding.avg * holding.qty + execPrice * quantity) / newQty;
+            holding.qty = newQty;
+            holding.price = execPrice;
+          }
+
+          await holding.save();
+          realizedPnl = 0;
         }
+      }
 
-        await holding.save();
-        realizedPnl = 0;
-      } else {
-        // SELL: reduce holding qty and compute realized P&L
+      // ===== SELL =====
+      else {
         const holding = await HoldingsModel.findOne({
           user: req.userId,
           name,
         });
 
-        if (!holding || (holding.qty ?? 0) < quantity) {
+        if (!holding || holding.qty < quantity) {
           status = "REJECTED";
           rejectionReason = "Insufficient quantity to sell";
         } else {
-          const existingQty = holding.qty;
-          const existingAvg = holding.avg ?? execPrice;
+          realizedPnl = (execPrice - holding.avg) * quantity;
 
-          realizedPnl = (execPrice - existingAvg) * quantity;
+          holding.qty -= quantity;
 
-          const newQty = existingQty - quantity;
-
-          if (newQty > 0) {
-            holding.qty = newQty;
+          if (holding.qty === 0) {
+            await holding.deleteOne();
+          } else {
             holding.price = execPrice;
             await holding.save();
-          } else {
-            // no more quantity left, remove holding
-            await holding.deleteOne();
           }
+
+          // Credit funds
+          const proceeds = execPrice * quantity;
+          user.funds.available += proceeds;
+          user.funds.used -= proceeds;
+          await user.save();
         }
       }
     }
 
+    // ---------- Persist order ----------
     const orderDoc = new OrdersModel({
       user: req.userId,
       name,
@@ -608,6 +883,175 @@ app.post("/newOrder", authMiddleware, async (req, res) => {
     return res.status(500).json({ message: "Internal server error" });
   }
 });
+
+app.post("/newOrder", authMiddleware, async (req, res) => {
+  try {
+    const { name, qty, price, mode, orderType: rawOrderType } = req.body;
+
+    // ---------- Normalize orderType FIRST ----------
+    const orderType =
+      rawOrderType === "LIMIT" || rawOrderType === "MARKET"
+        ? rawOrderType
+        : "MARKET";
+
+    // ---------- Basic validation ----------
+    if (!name || !qty || !mode) {
+      return res
+        .status(400)
+        .json({ message: "name, qty and mode are required" });
+    }
+
+    const quantity = Number(qty);
+    if (!Number.isFinite(quantity) || quantity <= 0) {
+      return res.status(400).json({ message: "Invalid quantity" });
+    }
+
+    // ---------- Price validation (ONLY for LIMIT) ----------
+    const requestedPrice = orderType === "LIMIT" ? Number(price) : null;
+
+    if (orderType === "LIMIT") {
+      if (!Number.isFinite(requestedPrice) || requestedPrice <= 0) {
+        return res.status(400).json({ message: "Valid limit price required" });
+      }
+    }
+
+    const side = mode === "SELL" ? "SELL" : "BUY";
+    const currentPrice = getCurrentPriceForSymbol(name);
+
+    // ---------- Initial order state ----------
+    let status = "REJECTED";
+    let executedPrice = null;
+    let realizedPnl = 0;
+    let rejectionReason = "";
+
+    // ---------- Decide execution ----------
+    if (orderType === "MARKET") {
+      status = "EXECUTED";
+      executedPrice = currentPrice;
+    } else {
+      // LIMIT orders
+      if (side === "BUY") {
+        if (currentPrice <= requestedPrice) {
+          status = "EXECUTED";
+          executedPrice = currentPrice; // ✅ best available price
+        } else {
+          status = "REJECTED";
+          rejectionReason = "Limit price not met";
+        }
+      }
+
+      if (side === "SELL") {
+        if (currentPrice >= requestedPrice) {
+          status = "EXECUTED";
+          executedPrice = currentPrice; // ✅ best available price
+        } else {
+          status = "REJECTED";
+          rejectionReason = "Limit price not met";
+        }
+      }
+    }
+
+
+    // ---------- Fetch user ----------
+    const user = await UserModel.findById(req.userId);
+    if (!user) {
+      return res.status(401).json({ message: "User not found" });
+    }
+
+    // ---------- Execute effects ----------
+    if (status === "EXECUTED") {
+      const execPrice = executedPrice;
+
+      // ===== BUY =====
+      if (side === "BUY") {
+        const cost = execPrice * quantity;
+
+        if (user.funds.available < cost) {
+          status = "REJECTED";
+          rejectionReason = "Insufficient funds";
+        } else {
+          user.funds.available -= cost;
+          user.funds.used += cost;
+          await user.save();
+
+          let holding = await HoldingsModel.findOne({
+            user: req.userId,
+            name,
+          });
+
+          if (!holding) {
+            holding = new HoldingsModel({
+              user: req.userId,
+              name,
+              qty: quantity,
+              avg: execPrice,
+              price: execPrice,
+            });
+          } else {
+            const newQty = holding.qty + quantity;
+            holding.avg =
+              (holding.avg * holding.qty + execPrice * quantity) / newQty;
+            holding.qty = newQty;
+            holding.price = execPrice;
+          }
+
+          await holding.save();
+        }
+      }
+
+      // ===== SELL =====
+      else {
+        const holding = await HoldingsModel.findOne({
+          user: req.userId,
+          name,
+        });
+
+        if (!holding || holding.qty < quantity) {
+          status = "REJECTED";
+          rejectionReason = "Insufficient quantity to sell";
+        } else {
+          realizedPnl = (execPrice - holding.avg) * quantity;
+
+          holding.qty -= quantity;
+
+          if (holding.qty === 0) {
+            await holding.deleteOne();
+          } else {
+            holding.price = execPrice;
+            await holding.save();
+          }
+
+          // Correct fund release
+          user.funds.available += execPrice * quantity;
+          user.funds.used -= holding.avg * quantity;
+          await user.save();
+        }
+      }
+    }
+
+    // ---------- Persist order ----------
+    const orderDoc = new OrdersModel({
+      user: req.userId,
+      name,
+      qty: quantity,
+      price: requestedPrice, // null for MARKET
+      mode: side,
+      orderType,
+      status,
+      executedPrice,
+      realizedPnl,
+      rejectionReason,
+    });
+
+    await orderDoc.save();
+    return res.json(orderDoc);
+  } catch (err) {
+    console.error("New order error", err);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+
 
 mongoose
   .connect(MONGO_URI)

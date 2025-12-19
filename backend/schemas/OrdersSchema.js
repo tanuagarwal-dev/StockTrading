@@ -21,7 +21,9 @@ export const OrdersSchema = new Schema(
     // Original requested price (for LIMIT) or client-specified price
     price: {
       type: Number,
-      required: true,
+      required: function () {
+        return this.orderType === "LIMIT";
+      }
     },
     // BUY or SELL
     mode: {
