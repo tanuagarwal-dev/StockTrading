@@ -6,6 +6,7 @@ import { useContext, useEffect, useMemo, useState } from "react";
 import Menu from "@/components/dashboard/Menu";
 import apiClient from "@/lib/apiClient";
 import GeneralContext from "@/context/GeneralContext";
+import { useUser } from "@/context/UserContext";
 
 type Holding = {
   name: string;
@@ -21,6 +22,8 @@ type Order = {
 };
 
 export default function DashboardPage() {
+  const { user, logout } = useUser();
+  if (!user) return null;
   const [holdings, setHoldings] = useState<Holding[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
   const [livePrices, setLivePrices] = useState<Record<string, number>>({});
@@ -120,7 +123,7 @@ export default function DashboardPage() {
       <section className="p-4 md:p-6 max-w-7xl mx-auto space-y-4 md:space-y-6 bg-gray-50 dark:bg-gray-900 min-h-screen">
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4 md:p-6 border border-gray-200 dark:border-gray-700">
           <h6 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white">
-            Hi, User! 👋
+            Hi, {user?.name || "User"}! 👋
           </h6>
           <p className="text-xs md:text-sm text-gray-600 dark:text-gray-400 mt-1">
             Welcome back to your trading dashboard
@@ -128,7 +131,7 @@ export default function DashboardPage() {
         </div>
 
         {selectedStock && (
-          <div className="bg-gradient-to-r from-blue-500 to-indigo-600 dark:from-blue-600 dark:to-indigo-700 rounded-xl shadow-lg p-4 md:p-6 text-white">
+          <div className="bg-linear-to-r from-blue-500 to-indigo-600 dark:from-blue-600 dark:to-indigo-700 rounded-xl shadow-lg p-4 md:p-6 text-white">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
               <div className="space-y-2 w-full sm:w-auto">
                 <p className="text-xs md:text-sm font-medium text-blue-100">
@@ -172,7 +175,7 @@ export default function DashboardPage() {
           </h3>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-            <div className="bg-gradient-to-br from-emerald-50 to-green-50 dark:from-emerald-900/20 dark:to-green-900/20 rounded-lg p-4 md:p-5 border border-emerald-200 dark:border-emerald-800">
+            <div className="bg-linear-to-br from-emerald-50 to-green-50 dark:from-emerald-900/20 dark:to-green-900/20 rounded-lg p-4 md:p-5 border border-emerald-200 dark:border-emerald-800">
               <p className="text-xs md:text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
                 Realized P&L
               </p>
@@ -188,7 +191,7 @@ export default function DashboardPage() {
               </p>
             </div>
 
-            <div className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-lg p-4 md:p-5 border border-blue-200 dark:border-blue-800">
+            <div className="bg-linear-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-lg p-4 md:p-5 border border-blue-200 dark:border-blue-800">
               <p className="text-xs md:text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
                 Unrealized P&L
               </p>
@@ -204,7 +207,7 @@ export default function DashboardPage() {
               </p>
             </div>
 
-            <div className="bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-lg p-4 md:p-5 border border-purple-200 dark:border-purple-800 sm:col-span-2 lg:col-span-1">
+            <div className="bg-linear-to-br from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-lg p-4 md:p-5 border border-purple-200 dark:border-purple-800 sm:col-span-2 lg:col-span-1">
               <p className="text-xs md:text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
                 Total P&L
               </p>
@@ -229,12 +232,12 @@ export default function DashboardPage() {
 
           <div className="flex flex-col md:flex-row md:items-center gap-6 md:gap-8">
             <div className="flex-1">
-              <div className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-lg p-5 md:p-6 border border-green-200 dark:border-green-800">
+              <div className="bg-linear-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-lg p-5 md:p-6 border border-green-200 dark:border-green-800">
                 <p className="text-xs md:text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
                   Margin Available
                 </p>
                 <h3 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white">
-                  ₹3.74k
+                  ₹{user.funds.available.toLocaleString("en-IN")}
                 </h3>
               </div>
             </div>

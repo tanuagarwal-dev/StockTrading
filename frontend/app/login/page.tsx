@@ -3,9 +3,12 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
+// import { useUser } from "@/context/UserContext";
 
 export default function LoginPage() {
   const router = useRouter();
+  // const { setUser } = useUser();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -23,12 +26,15 @@ export default function LoginPage() {
       });
 
       const token = res.data?.token;
-      if (token) {
-        localStorage.setItem("token", token);
-        router.push("/dashboard");
-      } else {
+      if (!token) {
         setError("Login failed: token missing in response");
+        return
       }
+       
+        localStorage.setItem("token", res.data.token);
+        // setUser(res.data.user);
+        router.push("/dashboard");
+      
     } catch (err: any) {
       const message =
         err?.response?.data?.message || "Unable to login. Please try again.";
@@ -39,7 +45,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 px-4">
+    <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 px-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
@@ -171,3 +177,5 @@ export default function LoginPage() {
     </div>
   );
 }
+
+
