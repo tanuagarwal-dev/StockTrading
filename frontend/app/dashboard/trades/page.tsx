@@ -2,25 +2,10 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Menu from "@/components/dashboard/Menu";
-import apiClient from "@/lib/apiClient";
 import CSVExport from "@/components/common/CSVExport";
+import { api, type Order, type PaginatedOrdersResponse } from "@/lib/api";
 
-type Trade = {
-  _id: string;
-  name: string;
-  qty: number;
-  mode: string;
-  executedPrice?: number;
-  realizedPnl?: number;
-  createdAt?: string;
-};
-
-type Meta = {
-  page: number;
-  limit: number;
-  total: number;
-  totalPages: number;
-};
+type Trade = Order & { _id: string };
 
 function formatDate(dateString?: string) {
   if (!dateString) return "-";
@@ -41,18 +26,20 @@ export default function TradesPage() {
   const [selectedDate, setSelectedDate] = useState<string>(
     toDateInputValue(new Date())
   );
-  const [meta, setMeta] = useState<Meta>({ page: 1, limit: 20, total: 0, totalPages: 0 });
-     const [page, setPage] = useState(1);
-     const LIMIT = 5;
+  const [meta, setMeta] = useState<PaginatedOrdersResponse["meta"]>({
+    page: 1,
+    limit: 20,
+    total: 0,
+    totalPages: 0,
+  });
+  const [page, setPage] = useState(1);
+  const LIMIT = 5;
 
-  const fetchTrades = (pageNum=page) => {
+  const fetchTrades = async (pageNum = page) => {
     try {
-      apiClient.get("/executedOrders", {
-        params: { page: pageNum, limit: LIMIT }
-      }).then((res) => {
-        setTrades(res.data.data);
-        setMeta(res.data.meta);
-      });
+      const res = await api.getExecutedOrders(pageNum, LIMIT);
+      setTrades(res.data as Trade[]);
+      setMeta(res.meta);
     } catch (error) {
       console.error("Failed to fetch trades:", error);
     }

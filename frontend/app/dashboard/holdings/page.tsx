@@ -3,30 +3,19 @@
 import { useContext, useEffect, useState } from "react";
 import VerticalGraph from "../../../charts/VerticalGraph";
 import Menu from "@/components/dashboard/Menu";
-import apiClient from "@/lib/apiClient";
+import { api, type Holding, type PriceMap } from "@/lib/api";
 import CSVExport from "@/components/common/CSVExport";
 import GeneralContext from "@/context/GeneralContext";
 
-type Holding = {
-  name: string;
-  qty: number;
-  avg: number;
-  price: number;
-  net: string;
-  day: string;
-  isLoss: boolean;
-};
-
 export default function Holdings() {
   const [allHoldings, setAllHoldings] = useState<Holding[]>([]);
-  const [livePrices, setLivePrices] = useState<Record<string, number>>({});
+  const [livePrices, setLivePrices] = useState<PriceMap>({});
   const { selectedStock, openBuyWindow, openSellWindow } =
     useContext(GeneralContext);
 
-  const fetchHoldings = () => {
-    apiClient.get("/allHoldings").then((res) => {
-      setAllHoldings(res.data);
-    });
+  const fetchHoldings = async () => {
+    const data = await api.getAllHoldings();
+    setAllHoldings(data);
   };
 
   useEffect(() => {
@@ -50,17 +39,16 @@ export default function Holdings() {
   useEffect(() => {
     let intervalId: NodeJS.Timeout | null = null;
 
-    const fetchPrices = () => {
-      apiClient
-        .get("/prices")
-        .then((res) => {
-          const data = res.data as Record<string, number>;
-          setLivePrices((prev) => ({
-            ...prev,
-            ...data,
-          }));
-        })
-        .catch(() => {});
+    const fetchPrices = async () => {
+      try {
+        const data = await api.getAllPrices();
+        setLivePrices((prev) => ({
+          ...prev,
+          ...data,
+        }));
+      } catch {
+        // swallow errors; UI will keep prior prices
+      }
     };
 
     fetchPrices();

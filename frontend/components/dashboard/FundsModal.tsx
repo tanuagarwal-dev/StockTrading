@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import apiClient from "@/lib/apiClient";
 import { useUser } from "@/context/UserContext";
+import api from "@/lib/api";
 
 type Props = {
   type: "ADD" | "WITHDRAW";
@@ -72,8 +72,6 @@ type Props = {
 //   );
 // }
 
-
-
 export default function FundsModal({
   type,
   onClose,
@@ -94,9 +92,11 @@ export default function FundsModal({
     }
 
     try {
-      await apiClient.post(isAdd ? "/funds/add" : "/funds/withdraw", {
-        amount,
-      });
+      if (isAdd) {
+        await api.addFunds({ amount });
+      } else {
+        await api.withdrawFunds({ amount });
+      }
 
       await refreshUser();
       onClose();

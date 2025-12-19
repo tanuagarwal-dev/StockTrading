@@ -4,7 +4,7 @@ import { useState, useContext, useEffect } from "react";
 import GeneralContext from "@/context/GeneralContext";
 import { watchlist } from "../../lib/dashboardData";
 import { DoughnutChart } from "../../charts/DoughnutChart";
-import apiClient from "@/lib/apiClient";
+import { api, type PriceMap } from "@/lib/api";
 
 function WatchListItem({ stock, price }: any) {
   const [showActions, setShowActions] = useState(false);
@@ -121,8 +121,8 @@ function WatchListActions({ uid }: { uid: string }) {
 }
 
 export default function WatchList() {
-  const [prices, setPrices] = useState<Record<string, number>>(() => {
-    const initial: Record<string, number> = {};
+  const [prices, setPrices] = useState<PriceMap>(() => {
+    const initial: PriceMap = {};
     watchlist.forEach((s) => {
       initial[s.name] = s.price;
     });
@@ -132,17 +132,16 @@ export default function WatchList() {
   useEffect(() => {
     let intervalId: NodeJS.Timeout | null = null;
 
-    const fetchPrices = () => {
-      apiClient
-        .get("/prices")
-        .then((res) => {
-          const data = res.data as Record<string, number>;
-          setPrices((prev) => ({
-            ...prev,
-            ...data,
-          }));
-        })
-        .catch(() => {});
+    const fetchPrices = async () => {
+      try {
+        const data = await api.getAllPrices();
+        setPrices((prev) => ({
+          ...prev,
+          ...data,
+        }));
+      } catch {
+        // silently fail; UI retains previous prices
+      }
     };
 
     fetchPrices();

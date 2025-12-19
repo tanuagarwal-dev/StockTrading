@@ -4,40 +4,30 @@
 // This page requires client interactivity
 import { useContext, useEffect, useMemo, useState } from "react";
 import Menu from "@/components/dashboard/Menu";
-import apiClient from "@/lib/apiClient";
 import GeneralContext from "@/context/GeneralContext";
 import { useUser } from "@/context/UserContext";
-
-type Holding = {
-  name: string;
-  qty: number;
-  avg: number;
-  price: number;
-};
-
-type Order = {
-  mode: string;
-  status?: string;
-  realizedPnl?: number;
-};
+import { api, type Holding, type Order, type PriceMap } from "@/lib/api";
 
 export default function DashboardPage() {
   const { user, logout } = useUser();
   if (!user) return null;
   const [holdings, setHoldings] = useState<Holding[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
-  const [livePrices, setLivePrices] = useState<Record<string, number>>({});
+  const [livePrices, setLivePrices] = useState<PriceMap>({});
   const { selectedStock, openBuyWindow, openSellWindow } =
     useContext(GeneralContext);
 
-  const fetchData = () => {
-    Promise.all([
-      apiClient.get("/allHoldings"),
-      apiClient.get("/allOrders"),
-    ]).then(([holdingsRes, ordersRes]) => {
-      setHoldings(holdingsRes.data);
-      setOrders(ordersRes.data);
-    });
+  const fetchData = async () => {
+    try {
+      const [holdingsRes, ordersRes] = await Promise.all([
+        api.getAllHoldings(),
+        api.getAllOrders(),
+      ]);
+      setHoldings(holdingsRes);
+      setOrders(ordersRes);
+    } catch {
+      // ignore errors; UI retains previous data
+    }
   };
 
   useEffect(() => {
@@ -61,17 +51,16 @@ export default function DashboardPage() {
   useEffect(() => {
     let intervalId: NodeJS.Timeout | null = null;
 
-    const fetchPrices = () => {
-      apiClient
-        .get("/prices")
-        .then((res) => {
-          const data = res.data as Record<string, number>;
-          setLivePrices((prev) => ({
-            ...prev,
-            ...data,
-          }));
-        })
-        .catch(() => {});
+    const fetchPrices = async () => {
+      try {
+        const data = await api.getAllPrices();
+        setLivePrices((prev) => ({
+          ...prev,
+          ...data,
+        }));
+      } catch {
+        // ignore price fetch errors; keep last known prices
+      }
     };
 
     fetchPrices();

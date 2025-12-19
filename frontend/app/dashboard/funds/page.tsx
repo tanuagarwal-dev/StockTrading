@@ -11,8 +11,8 @@ export default function Funds() {
 
   if (!user) return null;
 
-  const available = user.funds.available;
-  const used = user.funds.used;
+  const available = user?.funds?.available ?? 0;
+  const used = user?.funds?.used ?? 0;
   const total = available + used; // opening & live (simulator)
 
   return (

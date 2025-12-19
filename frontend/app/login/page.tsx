@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
+import api from "@/lib/api";
 // import { useUser } from "@/context/UserContext";
 
 export default function LoginPage() {
@@ -14,35 +15,35 @@ export default function LoginPage() {
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(null);
-    setIsSubmitting(true);
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  setError(null);
+  setIsSubmitting(true);
 
-    try {
-      const res = await axios.post("http://localhost:3002/auth/login", {
-        email,
-        password,
-      });
+  try {
+    const res = await api.login({ email, password });
 
-      const token = res.data?.token;
-      if (!token) {
-        setError("Login failed: token missing in response");
-        return
-      }
-       
-        localStorage.setItem("token", res.data.token);
-        // setUser(res.data.user);
-        router.push("/dashboard");
-      
-    } catch (err: any) {
-      const message =
-        err?.response?.data?.message || "Unable to login. Please try again.";
-      setError(message);
-    } finally {
-      setIsSubmitting(false);
+    if (!res.token) {
+      throw new Error("Login failed: token missing in response");
     }
-  };
+
+    localStorage.setItem("token", res.token);
+
+    // Optional but recommended if you use UserContext
+    // await refreshUser();
+
+    router.push("/dashboard");
+  } catch (err: any) {
+    const message =
+      err?.response?.data?.message ||
+      err?.message ||
+      "Unable to login. Please try again.";
+    setError(message);
+  } finally {
+    setIsSubmitting(false);
+  }
+};
+
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 px-4">

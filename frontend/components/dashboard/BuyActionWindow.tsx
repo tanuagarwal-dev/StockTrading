@@ -2,8 +2,8 @@
 
 import { useState, useContext, useEffect } from "react";
 import GeneralContext from "@/context/GeneralContext";
-import apiClient from "@/lib/apiClient";
 import { useUser } from "@/context/UserContext";
+import api from "@/lib/api";
 
 type Side = "BUY" | "SELL";
 
@@ -15,17 +15,16 @@ type Props = {
 export default function BuyActionWindow({ uid, mode }: Props) {
   const { closeBuyWindow } = useContext(GeneralContext);
   const [error, setError] = useState<string | null>(null);
-const { refreshUser } = useUser()
+  const { refreshUser } = useUser();
   const [stockQuantity, setStockQuantity] = useState<number>(1);
   const [stockPrice, setStockPrice] = useState<number>(1);
   const [orderType, setOrderType] = useState<"MARKET" | "LIMIT">("MARKET");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-
   const handleSubmit = async () => {
-  if (isSubmitting) return;
-  setError(null);
-  setIsSubmitting(true);
+    if (isSubmitting) return;
+    setError(null);
+    setIsSubmitting(true);
     try {
       // await apiClient.post("/newOrder", {
       //   name: uid,
@@ -34,26 +33,32 @@ const { refreshUser } = useUser()
       //   mode,
       //   orderType,
       // });
-      await apiClient.post("/newOrder", {
+      const order = await api.placeOrder({
         name: uid,
         qty: stockQuantity,
         mode,
         orderType,
         ...(orderType === "LIMIT" ? { price: stockPrice } : {}),
       });
+      // await apiClient.post("/newOrder", {
+      //   name: uid,
+      //   qty: stockQuantity,
+      //   mode,
+      //   orderType,
+      //   ...(orderType === "LIMIT" ? { price: stockPrice } : {}),
+      // });
 
       if (typeof window !== "undefined") {
         window.dispatchEvent(new Event("portfolio-updated"));
       }
       await refreshUser();
       closeBuyWindow();
-    } catch(err:any) { 
+    } catch (err: any) {
       setError(err?.response?.data?.message || "Order failed");
     } finally {
       setIsSubmitting(false);
     }
   };
-  
 
   useEffect(() => {
     if (orderType === "MARKET") {

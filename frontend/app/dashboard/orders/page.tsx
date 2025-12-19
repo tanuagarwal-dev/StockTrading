@@ -2,55 +2,60 @@
 import { useEffect, useState } from "react";
 import Menu from "@/components/dashboard/Menu";
 import Link from "next/link";
-import apiClient from "@/lib/apiClient";
+import { api, type Order, type PaginatedOrdersResponse } from "@/lib/api";
 
-type Order = {
-  name: string;
-  qty: number;
-  price: number;
-  mode: string;
-  orderType?: string;
-  status?: string;
-  executedPrice?: number;
-  realizedPnl?: number;
-  rejectionReason?: string;
-};
-type Meta = {
-  page: number;
-  limit: number;
-  total: number;
-  totalPages: number;
-};
+// type Order = {
+//   name: string;
+//   qty: number;
+//   price: number;
+//   mode: string;
+//   orderType?: string;
+//   status?: string;
+//   executedPrice?: number;
+//   realizedPnl?: number;
+//   rejectionReason?: string;
+// };
+// type Meta = {
+//   page: number;
+//   limit: number;
+//   total: number;
+//   totalPages: number;
+// };
 export default function Orders() {
   const [allOrders, setAllOrders] = useState<Order[]>([]);
-  const [meta, setMeta] = useState<Meta>({ page: 1, limit: 20, total: 0, totalPages: 0 });
-   const [page, setPage] = useState(1);
-   const LIMIT = 10;
+  const [meta, setMeta] = useState<PaginatedOrdersResponse["meta"]>({
+    page: 1,
+    limit: 20,
+    total: 0,
+    totalPages: 0,
+  });
+  const [page, setPage] = useState(1);
+  const LIMIT = 10;
 
-  const fetchOrders = (pageNum = page) => {
+  const fetchOrders = async (pageNum = page) => {
     try {
-      apiClient.get("/orders",
-       { params: { page: pageNum, limit: LIMIT } }
-    ).then((res) => {
-      setAllOrders(res.data.data);
-      setMeta(res.data.meta);
-    });
+      const res = await api.getOrders(pageNum, LIMIT);
+      setAllOrders(res.data);
+      setMeta(res.meta);
     } catch (error) {
       console.error("Failed to fetch orders:", error);
     }
   };
 
-   useEffect(() => {
+  useEffect(() => {
     fetchOrders(page);
 
     const handler = () => fetchOrders(page);
-    window.addEventListener("portfolio-updated", handler);
+    if (typeof window !== "undefined") {
+      window.addEventListener("portfolio-updated", handler);
+    }
 
     return () => {
-      window.removeEventListener("portfolio-updated", handler);
+      if (typeof window !== "undefined") {
+        window.removeEventListener("portfolio-updated", handler);
+      }
     };
-  }, [page])
-
+  }, [page]);
 
   // const labels = allOrders.map((h) => h.name);
 

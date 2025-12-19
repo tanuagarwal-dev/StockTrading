@@ -2,33 +2,25 @@
 
 import { useEffect, useState } from "react";
 import Menu from "@/components/dashboard/Menu";
-import apiClient from "@/lib/apiClient";
+import { api, type OHLCCandle } from "@/lib/api";
 import CandleChart from "@/charts/CandleChart";
-
-type Candle = {
-  timestamp: string;
-  open: number;
-  high: number;
-  low: number;
-  close: number;
-};
 
 const symbols = ["INFY", "TCS", "RELIANCE", "HDFCBANK", "SBIN", "ITC"];
 
 export default function OhlcPage() {
   const [symbol, setSymbol] = useState<string>(symbols[0]);
-  const [candles, setCandles] = useState<Candle[]>([]);
+  const [candles, setCandles] = useState<OHLCCandle[]>([]);
 
   useEffect(() => {
     let intervalId: NodeJS.Timeout | null = null;
 
-    const fetchOhlc = () => {
-      apiClient
-        .get(`/ohlc/${symbol}`)
-        .then((res) => {
-          setCandles(res.data as Candle[]);
-        })
-        .catch(() => {});
+    const fetchOhlc = async () => {
+      try {
+        const data = await api.getOHLC(symbol);
+        setCandles(data);
+      } catch {
+        // ignore errors; chart will retain last candles
+      }
     };
 
     fetchOhlc();

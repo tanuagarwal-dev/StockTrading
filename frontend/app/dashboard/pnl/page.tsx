@@ -2,21 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Menu from "@/components/dashboard/Menu";
-import apiClient from "@/lib/apiClient";
-
-type Holding = {
-  name: string;
-  qty: number;
-  avg: number;
-  price: number;
-};
-
-type Order = {
-  mode: string;
-  status?: string;
-  realizedPnl?: number;
-  createdAt?: string;
-};
+import { api, type Holding, type Order } from "@/lib/api";
 
 function toDateInputValue(date: Date) {
   const year = date.getFullYear();
@@ -41,13 +27,17 @@ export default function PnlReportPage() {
   );
   const [endDate, setEndDate] = useState<string>(toDateInputValue(today));
 
-  const fetchData = () => {
-    Promise.all([apiClient.get("/allHoldings"), apiClient.get("/allOrders")])
-      .then(([holdingsRes, ordersRes]) => {
-        setHoldings(holdingsRes.data);
-        setOrders(ordersRes.data);
-      })
-      .catch(() => {});
+  const fetchData = async () => {
+    try {
+      const [holdingsRes, ordersRes] = await Promise.all([
+        api.getAllHoldings(),
+        api.getAllOrders(),
+      ]);
+      setHoldings(holdingsRes);
+      setOrders(ordersRes);
+    } catch {
+      // ignore fetch errors; UI will keep last data
+    }
   };
 
   useEffect(() => {

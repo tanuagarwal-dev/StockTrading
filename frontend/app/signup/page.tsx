@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import Link from "next/link";
+import api from "@/lib/api";
 // import { useUser } from "@/context/UserContext";
 
 export default function SignupPage() {
@@ -21,13 +22,14 @@ export default function SignupPage() {
     setIsSubmitting(true);
 
     try {
-      const res = await axios.post("http://localhost:3002/auth/register", {
-        name,
-        email,
-        password,
-      });
+      const res = await api.register({name, email, password});
+      // const res = await axios.post("http://localhost:3002/auth/register", {
+      //   name,
+      //   email,
+      //   password,
+      // });
 
-      const token = res.data?.token;
+      const token = res?.token;
       if (token) {
         localStorage.setItem("token", token);
         router.push("/dashboard");

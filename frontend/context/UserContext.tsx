@@ -7,18 +7,9 @@ import {
   useState,
   ReactNode,
 } from "react";
-import apiClient from "@/lib/apiClient";
+import { api, type UserProfile } from "@/lib/api";
 
-export interface User {
-  id: string;
-  name: string;
-  email: string;
-  funds: {
-    available: number;
-    used: number;
-  };
-  role?: string;
-}
+export type User = UserProfile;
 
 interface UserContextType {
   user: User | null;
@@ -37,8 +28,8 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
 
   const refreshUser = async () => {
     try {
-      const res = await apiClient.get("/auth/me");
-      setUser(res.data);
+      const res = await api.getProfile();
+      setUser(res);
     } catch {
       setUser(null);
     } finally {

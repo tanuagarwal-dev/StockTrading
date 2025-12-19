@@ -1,25 +1,16 @@
 "use client";
 import { useEffect, useState } from "react";
 import Menu from "@/components/dashboard/Menu";
-import apiClient from "@/lib/apiClient";
-
-type Position = {
-  product: string;
-  name: string;
-  qty: number;
-  avg: number;
-  price: number;
-  day: string;
-  isLoss: boolean;
-};
+import { api, type Position } from "@/lib/api";
 
 export default function Positions() {
   const [allPositions, setAllPositions] = useState<Position[]>([]);
 
   useEffect(() => {
-    apiClient.get("/allPositions").then((res) => {
-      setAllPositions(res.data);
-    });
+    api
+      .getAllPositions()
+      .then((res) => setAllPositions(res))
+      .catch(() => {});
   }, []);
 
   const labels = allPositions.map((h) => h.name);
