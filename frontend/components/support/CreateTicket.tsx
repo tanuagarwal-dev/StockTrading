@@ -1,5 +1,3 @@
-import React from "react";
-
 const topics = [
   {
     title: "Account Opening",
@@ -55,12 +53,10 @@ const topics = [
 const CreateTicket = () => {
   return (
     <section className="max-w-7xl mx-auto px-6 py-16">
-      {/* Heading */}
       <h1 className="text-2xl md:text-3xl font-semibold mb-10">
         To create a ticket, select a relevant topic
       </h1>
 
-      {/* Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
         {topics.map((topic, idx) => (
           <div key={idx}>

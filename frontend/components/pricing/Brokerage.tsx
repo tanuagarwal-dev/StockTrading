@@ -1,10 +1,7 @@
-import React from "react";
-
 const Brokerage = () => {
   return (
     <section className="max-w-7xl mx-auto px-6 py-20 border-t border-gray-200">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-12 text-center md:text-left">
-        {/* Brokerage calculator */}
         <div className="md:col-span-2">
           <a
             href="#"
@@ -38,7 +35,6 @@ const Brokerage = () => {
           </ul>
         </div>
 
-        {/* Charges link */}
         <div className="flex items-start justify-center md:justify-start">
           <a
             href="#"

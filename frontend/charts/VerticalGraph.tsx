@@ -25,7 +25,7 @@ export const options: ChartOptions<"bar"> = {
   responsive: true,
   plugins: {
     legend: {
-      position: "top", // ✅ now correctly typed
+      position: "top",
     },
     title: {
       display: true,

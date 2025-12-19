@@ -1,16 +1,21 @@
-import Footer from '@/components/common/footer';
-import Header from '@/components/common/header';
-import Hero from '@/components/products/Hero';
-import LeftSection from '@/components/products/LeftSection';
-import RightSection from '@/components/products/RightSection';
-import Universe from '@/components/products/Universe';
-import React from 'react'
+import type { Metadata } from "next";
+import Footer from "@/components/common/footer";
+import Header from "@/components/common/header";
+import Hero from "@/components/products/Hero";
+import LeftSection from "@/components/products/LeftSection";
+import RightSection from "@/components/products/RightSection";
+import Universe from "@/components/products/Universe";
+
+export const metadata: Metadata = {
+  title: "Products - Trading Platforms",
+  description:
+    "Explore Kite, Console, Coin and our suite of investment platforms designed for every kind of trader and investor.",
+};
 
 const page = () => {
   return (
     <>
-      
-        <Header/>
+      <Header />
       <Hero />
       <LeftSection
         imageURL="media/images/kite.png"
@@ -56,9 +61,9 @@ const page = () => {
         blog.
       </p>
       <Universe />
-      <Footer/>
+      <Footer />
     </>
   );
-}
+};
 
-export default page
+export default page;

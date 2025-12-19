@@ -1,9 +1,8 @@
-import React from "react";
+import Image from "next/image";
 
 const Hero = () => {
   return (
     <section className="max-w-7xl mx-auto px-6 py-20">
-      {/* Top heading */}
       <div className="text-center border-b border-gray-200 pb-12 mb-16">
         <h1 className="text-4xl font-bold mb-4">Pricing</h1>
         <h3 className="text-gray-500 text-lg">
@@ -11,12 +10,14 @@ const Hero = () => {
         </h3>
       </div>
 
-      {/* Pricing cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-12 text-center">
         <div>
-          <img
+          <Image
             src="/media/images/pricingEquity.svg"
             alt="Free equity delivery"
+            width={96}
+            height={96}
+            sizes="96px"
             className="mx-auto mb-6 h-24"
           />
           <h2 className="text-xl font-semibold mb-2">Free equity delivery</h2>
@@ -27,9 +28,12 @@ const Hero = () => {
         </div>
 
         <div>
-          <img
+          <Image
             src="/media/images/intradayTrades.svg"
             alt="Intraday and F&O trades"
+            width={96}
+            height={96}
+            sizes="96px"
             className="mx-auto mb-6 h-24"
           />
           <h2 className="text-xl font-semibold mb-2">
@@ -42,9 +46,12 @@ const Hero = () => {
         </div>
 
         <div>
-          <img
+          <Image
             src="/media/images/pricingEquity.svg"
             alt="Free direct MF"
+            width={96}
+            height={96}
+            sizes="96px"
             className="mx-auto mb-6 h-24"
           />
           <h2 className="text-xl font-semibold mb-2">Free direct MF</h2>

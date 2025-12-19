@@ -1,4 +1,4 @@
-import React from "react";
+import Image from "next/image";
 
 type Props = {
   imageURL: string;
@@ -16,7 +16,6 @@ const RightSection = ({
   return (
     <div className="max-w-7xl mx-auto px-6 mt-20">
       <div className="flex flex-wrap items-center">
-        {/* Text Section */}
         <div className="w-full md:w-1/2 p-10">
           <h1 className="text-4xl font-bold mb-4">{productName}</h1>
 
@@ -30,9 +29,15 @@ const RightSection = ({
           </a>
         </div>
 
-        {/* Image Section */}
         <div className="w-full md:w-1/2">
-          <img src={imageURL} alt={productName} className="w-full h-auto" />
+          <Image
+            src={imageURL}
+            alt={productName}
+            width={600}
+            height={400}
+            sizes="(max-width: 768px) 100vw, 50vw"
+            className="w-full h-auto"
+          />
         </div>
       </div>
     </div>

@@ -1,19 +1,16 @@
-import React from "react";
+import Link from "next/link";
 
 const Hero = () => {
   return (
     <section className="max-w-7xl mx-auto px-6 py-12">
-      {/* Top bar */}
       <div className="flex items-center justify-between mb-10">
         <h4 className="text-lg font-medium text-gray-700">Support Portal</h4>
-        <a href="#" className="text-blue-600 font-medium hover:underline">
+        <Link href="#" className="text-blue-600 font-medium hover:underline">
           Track Tickets
-        </a>
+        </Link>
       </div>
 
-      {/* Main content */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-        {/* Left */}
         <div>
           <h1 className="text-xl md:text-2xl font-semibold mb-4">
             Search for an answer or browse help topics to create a ticket
@@ -26,35 +23,34 @@ const Hero = () => {
           />
 
           <div className="flex flex-wrap gap-4 text-sm">
-            <a href="#" className="text-blue-600 hover:underline">
+            <Link href="#" className="text-blue-600 hover:underline">
               Track account opening
-            </a>
-            <a href="#" className="text-blue-600 hover:underline">
+            </Link>
+            <Link href="#" className="text-blue-600 hover:underline">
               Track segment activation
-            </a>
-            <a href="#" className="text-blue-600 hover:underline">
+            </Link>
+            <Link href="#" className="text-blue-600 hover:underline">
               Intraday margins
-            </a>
-            <a href="#" className="text-blue-600 hover:underline">
+            </Link>
+            <Link href="#" className="text-blue-600 hover:underline">
               Kite user manual
-            </a>
+            </Link>
           </div>
         </div>
 
-        {/* Right */}
         <div>
           <h1 className="text-xl md:text-2xl font-semibold mb-4">Featured</h1>
 
           <ol className="list-decimal list-inside space-y-2 text-sm">
             <li>
-              <a href="#" className="text-blue-600 hover:underline">
+              <Link href="#" className="text-blue-600 hover:underline">
                 Current Takeovers and Delisting – January 2024
-              </a>
+              </Link>
             </li>
             <li>
-              <a href="#" className="text-blue-600 hover:underline">
+              <Link href="#" className="text-blue-600 hover:underline">
                 Latest Intraday leverages – MIS & CO
-              </a>
+              </Link>
             </li>
           </ol>
         </div>

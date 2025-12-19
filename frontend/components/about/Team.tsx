@@ -1,20 +1,21 @@
-import React from "react";
+import Link from "next/link";
+import Image from "next/image";
 
 const Team = () => {
   return (
     <section className="max-w-7xl mx-auto px-6 py-20">
-      {/* Heading */}
       <div className="border-t border-gray-200 pt-12 mb-12">
         <h1 className="text-3xl font-semibold text-center">People</h1>
       </div>
 
-      {/* Content */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-12 text-gray-600 text-lg leading-relaxed">
-        {/* Left: Profile */}
         <div className="flex flex-col items-center text-center">
-          <img
+          <Image
             src="/media/images/nithinKamath.jpg"
             alt="Nithin Kamath"
+            width={192}
+            height={192}
+            sizes="192px"
             className="w-48 h-48 object-cover rounded-full mb-6"
           />
 
@@ -22,7 +23,6 @@ const Team = () => {
           <p className="text-sm text-gray-500">Founder, CEO</p>
         </div>
 
-        {/* Right: Bio */}
         <div className="space-y-4">
           <p>
             Nithin bootstrapped and founded Zerodha in 2010 to overcome the
@@ -39,17 +39,17 @@ const Team = () => {
 
           <p>
             Connect on{" "}
-            <a href="#" className="text-blue-600 hover:underline">
+            <Link href="#" className="text-blue-600 hover:underline">
               Homepage
-            </a>{" "}
+            </Link>{" "}
             /{" "}
-            <a href="#" className="text-blue-600 hover:underline">
+            <Link href="#" className="text-blue-600 hover:underline">
               TradingQnA
-            </a>{" "}
+            </Link>{" "}
             /{" "}
-            <a href="#" className="text-blue-600 hover:underline">
+            <Link href="#" className="text-blue-600 hover:underline">
               Twitter
-            </a>
+            </Link>
           </p>
         </div>
       </div>

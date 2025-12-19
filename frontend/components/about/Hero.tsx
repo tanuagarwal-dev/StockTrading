@@ -1,18 +1,15 @@
-import React from "react";
+import Link from "next/link";
 
 const Hero = () => {
   return (
     <section className="max-w-7xl mx-auto px-6 py-20">
-      {/* Heading */}
       <h1 className="text-3xl md:text-4xl font-semibold text-center mb-16 leading-snug">
         We pioneered the discount broking model in India
         <br />
         Now, we are breaking ground with our technology.
       </h1>
 
-      {/* Content */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-12 border-t border-gray-200 pt-12 text-gray-600 text-lg leading-relaxed">
-        {/* Left column */}
         <div className="space-y-4">
           <p>
             We kick-started operations on the 15th of August, 2010 with the goal
@@ -34,7 +31,6 @@ const Hero = () => {
           </p>
         </div>
 
-        {/* Right column */}
         <div className="space-y-4">
           <p>
             In addition, we run a number of popular open online educational and
@@ -42,9 +38,9 @@ const Hero = () => {
           </p>
 
           <p>
-            <a href="#" className="text-blue-600 hover:underline">
+            <Link href="#" className="text-blue-600 hover:underline">
               Rainmatter
-            </a>
+            </Link>
             , our fintech fund and incubator, has invested in several fintech
             startups with the goal of growing the Indian capital markets.
           </p>

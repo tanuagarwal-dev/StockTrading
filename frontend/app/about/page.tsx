@@ -1,18 +1,24 @@
-import Hero from '@/components/about/Hero';
-import Team from '@/components/about/Team';
-import Header from '@/components/common/header';
-import React from 'react'
-import Footer from './../../components/common/footer';
+import type { Metadata } from "next";
+import Hero from "@/components/about/Hero";
+import Team from "@/components/about/Team";
+import Header from "@/components/common/header";
+import Footer from "./../../components/common/footer";
+
+export const metadata: Metadata = {
+  title: "About Us",
+  description:
+    "We pioneered the discount broking model in India. Learn about our mission to break barriers in trading and investing.",
+};
 
 const page = () => {
   return (
     <>
-      <Header/>
+      <Header />
       <Hero />
       <Team />
-      <Footer/>
+      <Footer />
     </>
   );
-}
+};
 
-export default page
+export default page;
