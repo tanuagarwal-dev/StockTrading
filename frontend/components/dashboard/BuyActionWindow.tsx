@@ -10,9 +10,10 @@ type Side = "BUY" | "SELL";
 type Props = {
   uid: string;
   mode: Side;
+  onClose?: () => void;
 };
 
-export default function BuyActionWindow({ uid, mode }: Props) {
+export default function BuyActionWindow({ uid, mode, onClose }: Props) {
   const { closeBuyWindow } = useContext(GeneralContext);
   const [error, setError] = useState<string | null>(null);
   const { refreshUser } = useUser();
@@ -52,7 +53,7 @@ export default function BuyActionWindow({ uid, mode }: Props) {
         window.dispatchEvent(new Event("portfolio-updated"));
       }
       await refreshUser();
-      closeBuyWindow();
+      (onClose ?? closeBuyWindow)();
     } catch (err: any) {
       setError(err?.response?.data?.message || "Order failed");
     } finally {
@@ -141,7 +142,7 @@ export default function BuyActionWindow({ uid, mode }: Props) {
             </button>
 
             <button
-              onClick={closeBuyWindow}
+              onClick={onClose ?? closeBuyWindow}
               className="px-5 py-2 bg-[#d4d4d4] text-gray-700 text-sm rounded hover:bg-[#9b9b9b] hover:text-white"
             >
               Cancel

@@ -9,16 +9,20 @@ export const UserSchema = new Schema(
       required: true,
       trim: true,
     },
-    
+
     funds: {
       available: {
         type: Number,
-        default: 0, 
+        default: 0,
       },
       used: {
         type: Number,
         default: 0,
       },
+    },
+    watchlist: {
+      type: [String], // ["INFY", "TCS"]
+      default: [],
     },
 
     role: {
@@ -42,5 +46,3 @@ export const UserSchema = new Schema(
     timestamps: true,
   }
 );
-
-

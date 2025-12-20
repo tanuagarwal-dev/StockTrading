@@ -239,7 +239,7 @@ export default function DashboardPage() {
                   Margins Used
                 </span>
                 <span className="text-base md:text-lg font-bold text-gray-900 dark:text-white">
-                  ₹0
+                  ₹{user.funds.used.toLocaleString("en-IN")}
                 </span>
               </div>
 
@@ -248,7 +248,7 @@ export default function DashboardPage() {
                   Opening Balance
                 </span>
                 <span className="text-base md:text-lg font-bold text-gray-900 dark:text-white">
-                  ₹3.74k
+                  ₹{(user.funds.available + user.funds.used).toLocaleString("en-IN")}
                 </span>
               </div>
             </div>

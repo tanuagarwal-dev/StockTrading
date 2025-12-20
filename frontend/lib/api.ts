@@ -122,6 +122,21 @@ export interface SinglePrice {
   price: number;
 }
 
+export interface WatchlistEntry {
+  symbol: string;
+  price: number | null;
+}
+
+export interface PaginatedSymbolsResponse {
+  data: { symbol: string }[];
+  meta: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
+}
+
 export interface OHLCCandle {
   timestamp: string;
   open: number;
@@ -291,6 +306,33 @@ class API {
     return response.data;
   }
 
+  /**
+   * Get current prices for all symbols via /market namespace (no auth required)
+   */
+  async getMarketPrices(): Promise<PriceMap> {
+    const response = await apiClient.get<PriceMap>("/market/prices");
+    return response.data;
+  }
+
+  /**
+   * Get a single symbol price via /market namespace (no auth required)
+   */
+  async getMarketPrice(symbol: string): Promise<SinglePrice> {
+    const response = await apiClient.get<SinglePrice>(
+      `/market/price/${symbol}`
+    );
+    return response.data;
+  }
+
+  async getMarketSymbols(
+    page = 1,
+    limit = 10
+  ): Promise<PaginatedSymbolsResponse> {
+    const res = await apiClient.get("/market/symbols", {
+      params: { page, limit },
+    });
+    return res.data;
+  }
   // ==================== OHLC CANDLE DATA ====================
 
   /**
@@ -301,6 +343,29 @@ class API {
   async getOHLC(symbol: string): Promise<OHLCCandle[]> {
     const response = await apiClient.get<OHLCCandle[]>(`/ohlc/${symbol}`);
     return response.data;
+  }
+
+  // ==================== WATCHLIST ====================
+
+  async getWatchlist(): Promise<WatchlistEntry[]> {
+    const response = await apiClient.get<WatchlistEntry[]>("/watchlist");
+    return response.data;
+  }
+
+  async addToWatchlist(symbol: string): Promise<string[]> {
+    const response = await apiClient.post<{ watchlist: string[] }>(
+      "/watchlist/add",
+      { symbol }
+    );
+    return response.data.watchlist;
+  }
+
+  async removeFromWatchlist(symbol: string): Promise<string[]> {
+    const response = await apiClient.delete<{ watchlist: string[] }>(
+      "/watchlist/remove",
+      { data: { symbol } }
+    );
+    return response.data.watchlist;
   }
 }
 

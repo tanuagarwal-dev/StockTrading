@@ -12,7 +12,7 @@ const tabs = [
   { label: "Trades", href: "/dashboard/trades" },
   { label: "OHLC", href: "/dashboard/ohlc" },
   { label: "Funds", href: "/dashboard/funds" },
-  { label: "Shares", href: "/dashboard/shares" },
+  { label: "Market", href: "/dashboard/shares" },
   { label: "Apps", href: "/dashboard/apps" },
 ];
 

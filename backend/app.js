@@ -6,6 +6,8 @@ import authRoutes from "./routes/auth.routes.js";
 import fundsRoutes from "./routes/funds.routes.js";
 import ordersRoutes from "./routes/order.routes.js"
 import readOnlyRoutes from "./routes/readOnly.routes.js"
+import marketRoutes from "./routes/market.routes.js"
+import watchlistRoutes from "./routes/watchlist.routes.js"
 
 const app = express();
 
@@ -17,6 +19,8 @@ app.use(bodyParser.json());
 app.use("/auth", authRoutes);
 app.use("/funds", fundsRoutes);
 app.use("/orders", ordersRoutes);
+app.use("/market", marketRoutes)
+app.use("/watchlist", watchlistRoutes)
 // app.use("/holdings", holdingsRoutes);
 // app.use("/prices", pricesRoutes);
 app.use("/ohlc", ohlcRoutes);

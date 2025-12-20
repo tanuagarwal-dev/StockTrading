@@ -2,76 +2,94 @@
 
 import { useState, useContext, useEffect } from "react";
 import GeneralContext from "@/context/GeneralContext";
-import { watchlist } from "../../lib/dashboardData";
 import { DoughnutChart } from "../../charts/DoughnutChart";
-import { api, type PriceMap } from "@/lib/api";
+import { api, type PriceMap, type WatchlistEntry } from "@/lib/api";
 
-function WatchListItem({ stock, price }: any) {
+function WatchListItem({ symbol, price }: { symbol: string; price: number }) {
   const [showActions, setShowActions] = useState(false);
   const generalContext = useContext(GeneralContext);
 
   return (
+    // <li
+    //   onMouseEnter={() => setShowActions(true)}
+    //   onMouseLeave={() => setShowActions(false)}
+    //   onClick={() =>
+    //     generalContext.setSelectedStock({ symbol, price })
+    //   }
+    //   className="relative rounded-lg px-3 py-2.5 bg-gray-50 dark:bg-gray-900 hover:bg-blue-50 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700 cursor-pointer transition-all duration-200 hover:shadow-md"
+    // >
+    //   <div className="flex justify-between items-center">
+    //     <p
+    //       className={`text-sm font-semibold ${
+    //         stock.isDown
+    //           ? "text-red-600 dark:text-red-400"
+    //           : "text-green-600 dark:text-green-400"
+    //       }`}
+    //     >
+    //       {stock.name}
+    //     </p>
+
+    //     <div className="flex items-center gap-2 text-xs">
+    //       <span
+    //         className={`font-medium ${
+    //           stock.isDown
+    //             ? "text-red-600 dark:text-red-400"
+    //             : "text-green-600 dark:text-green-400"
+    //         }`}
+    //       >
+    //         {stock.percent}
+    //       </span>
+    //       {stock.isDown ? (
+    //         <svg
+    //           className="w-4 h-4 text-red-600 dark:text-red-400"
+    //           fill="currentColor"
+    //           viewBox="0 0 20 20"
+    //         >
+    //           <path
+    //             fillRule="evenodd"
+    //             d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+    //             clipRule="evenodd"
+    //           />
+    //         </svg>
+    //       ) : (
+    //         <svg
+    //           className="w-4 h-4 text-green-600 dark:text-green-400"
+    //           fill="currentColor"
+    //           viewBox="0 0 20 20"
+    //         >
+    //           <path
+    //             fillRule="evenodd"
+    //             d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z"
+    //             clipRule="evenodd"
+    //           />
+    //         </svg>
+    //       )}
+    //       <span className="font-bold text-gray-900 dark:text-white">
+    //         ₹{price.toFixed(2)}
+    //       </span>
+    //     </div>
+    //   </div>
+
+    //   {showActions && <WatchListActions uid={stock.name} />}
+    // </li>
+
     <li
       onMouseEnter={() => setShowActions(true)}
       onMouseLeave={() => setShowActions(false)}
-      onClick={() =>
-        generalContext.setSelectedStock({ symbol: stock.name, price })
-      }
-      className="relative rounded-lg px-3 py-2.5 bg-gray-50 dark:bg-gray-900 hover:bg-blue-50 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700 cursor-pointer transition-all duration-200 hover:shadow-md"
+      onClick={() => generalContext.setSelectedStock({ symbol, price })}
+      className="relative rounded-lg px-3 py-2.5 bg-gray-50 dark:bg-gray-900 hover:bg-blue-50 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700 cursor-pointer transition-all"
     >
       <div className="flex justify-between items-center">
-        <p
-          className={`text-sm font-semibold ${
-            stock.isDown
-              ? "text-red-600 dark:text-red-400"
-              : "text-green-600 dark:text-green-400"
-          }`}
-        >
-          {stock.name}
+        <p className="text-sm font-semibold text-gray-900 dark:text-white">
+          {symbol}
         </p>
 
-        <div className="flex items-center gap-2 text-xs">
-          <span
-            className={`font-medium ${
-              stock.isDown
-                ? "text-red-600 dark:text-red-400"
-                : "text-green-600 dark:text-green-400"
-            }`}
-          >
-            {stock.percent}
-          </span>
-          {stock.isDown ? (
-            <svg
-              className="w-4 h-4 text-red-600 dark:text-red-400"
-              fill="currentColor"
-              viewBox="0 0 20 20"
-            >
-              <path
-                fillRule="evenodd"
-                d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                clipRule="evenodd"
-              />
-            </svg>
-          ) : (
-            <svg
-              className="w-4 h-4 text-green-600 dark:text-green-400"
-              fill="currentColor"
-              viewBox="0 0 20 20"
-            >
-              <path
-                fillRule="evenodd"
-                d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z"
-                clipRule="evenodd"
-              />
-            </svg>
-          )}
-          <span className="font-bold text-gray-900 dark:text-white">
-            ₹{price.toFixed(2)}
-          </span>
-        </div>
+        <span className="font-bold text-gray-900 dark:text-white">
+          ₹{price.toFixed(2)}
+        </span>
       </div>
 
-      {showActions && <WatchListActions uid={stock.name} />}
+      {showActions && <WatchListActions uid={symbol} />}
     </li>
   );
 }
@@ -121,52 +139,82 @@ function WatchListActions({ uid }: { uid: string }) {
 }
 
 export default function WatchList() {
-  const [prices, setPrices] = useState<PriceMap>(() => {
-    const initial: PriceMap = {};
-    watchlist.forEach((s) => {
-      initial[s.name] = s.price;
-    });
-    return initial;
-  });
+  const [watchlist, setWatchlist] = useState<WatchlistEntry[]>([]);
+  const [prices, setPrices] = useState<PriceMap>({});
 
+  // const [prices, setPrices] = useState<PriceMap>(() => {
+  //   const initial: PriceMap = {};
+  //   watchlist.forEach((s) => {
+  //     initial[s.name] = s.price;
+  //   });
+  //   return initial;
+  // });
+
+  // useEffect(() => {
+  //   let intervalId: NodeJS.Timeout | null = null;
+
+  //   const fetchPrices = async () => {
+  //     try {
+  //       const data = await api.getAllPrices();
+  //       setPrices((prev) => ({
+  //         ...prev,
+  //         ...data,
+  //       }));
+  //     } catch {
+  //       // silently fail; UI retains previous prices
+  //     }
+  //   };
+
+  //   fetchPrices();
+  //   intervalId = setInterval(fetchPrices, 5000);
+
+  //   return () => {
+  //     if (intervalId) {
+  //       clearInterval(intervalId);
+  //     }
+  //   };
+  // }, []);
+
+  // Initial fetch + refresh when other components update the watchlist
   useEffect(() => {
-    let intervalId: NodeJS.Timeout | null = null;
-
-    const fetchPrices = async () => {
-      try {
-        const data = await api.getAllPrices();
-        setPrices((prev) => ({
-          ...prev,
-          ...data,
-        }));
-      } catch {
-        // silently fail; UI retains previous prices
-      }
+    const fetchWatchlist = async () => {
+      const data = await api.getWatchlist();
+      setWatchlist(data);
     };
 
-    fetchPrices();
-    intervalId = setInterval(fetchPrices, 5000);
+    fetchWatchlist();
+
+    const handler = () => fetchWatchlist();
+    window.addEventListener("watchlist-updated", handler);
 
     return () => {
-      if (intervalId) {
-        clearInterval(intervalId);
-      }
+      window.removeEventListener("watchlist-updated", handler);
     };
   }, []);
 
-  const labels = watchlist.map((s) => s.name);
+  // 🔹 Fetch prices repeatedly
+  useEffect(() => {
+    const fetchPrices = async () => {
+      const data = await api.getAllPrices();
+      setPrices(data);
+    };
 
-  const data = {
-    labels,
+    fetchPrices();
+    const id = setInterval(fetchPrices, 5000);
+    return () => clearInterval(id);
+  }, []);
+
+  const symbols = watchlist.map((w) => w.symbol);
+
+  const chartData = {
+    labels: symbols,
     datasets: [
       {
-        label: "Price",
-        data: watchlist.map((s) => prices[s.name] ?? s.price),
+        data: symbols.map((s) => prices[s] ?? 0),
         backgroundColor: [
-          "#f87171",
           "#60a5fa",
-          "#facc15",
           "#34d399",
+          "#facc15",
           "#a78bfa",
           "#fb923c",
         ],
@@ -174,40 +222,84 @@ export default function WatchList() {
     ],
   };
 
+  // const labels = watchlist.map((s) => s.name);
+
+  // const data = {
+  //   labels,
+  //   datasets: [
+  //     {
+  //       label: "Price",
+  //       data: watchlist.map((s) => prices[s.name] ?? s.price),
+  //       backgroundColor: [
+  //         "#f87171",
+  //         "#60a5fa",
+  //         "#facc15",
+  //         "#34d399",
+  //         "#a78bfa",
+  //         "#fb923c",
+  //       ],
+  //     },
+  //   ],
+  // };
+
   return (
-    <aside className="p-4 space-y-6 overflow-y-auto max-h-[calc(100vh-4rem)]">
-      <div className="space-y-2">
-        <input
-          type="text"
-          placeholder="Search eg: infy, bse, nifty fut"
-          className="w-full rounded-lg border border-gray-300 dark:border-gray-600 px-4 py-2.5 text-sm bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 transition shadow-sm"
-        />
-        <div className="flex items-center justify-between">
-          <span className="text-xs font-medium text-gray-600 dark:text-gray-400">
-            Watchlist
-          </span>
-          <span className="text-xs font-semibold text-blue-600 dark:text-blue-400">
-            {watchlist.length} / 50
-          </span>
-        </div>
+    // <aside className="p-4 space-y-6 overflow-y-auto max-h-[calc(100vh-4rem)]">
+    //   <div className="space-y-2">
+    //     <input
+    //       type="text"
+    //       placeholder="Search eg: infy, bse, nifty fut"
+    //       className="w-full rounded-lg border border-gray-300 dark:border-gray-600 px-4 py-2.5 text-sm bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 transition shadow-sm"
+    //     />
+    //     <div className="flex items-center justify-between">
+    //       <span className="text-xs font-medium text-gray-600 dark:text-gray-400">
+    //         Watchlist
+    //       </span>
+    //       <span className="text-xs font-semibold text-blue-600 dark:text-blue-400">
+    //         {watchlist.length} / 50
+    //       </span>
+    //     </div>
+    //   </div>
+
+    //   <ul className="space-y-2">
+    //     {watchlist.map((stock) => (
+    //       <WatchListItem
+    //         key={stock.name}
+    //         stock={stock}
+    //         price={prices[stock.name] ?? stock.price}
+    //       />
+    //     ))}
+    //   </ul>
+
+    //   <div className="bg-white dark:bg-gray-900 rounded-xl p-4 border border-gray-200 dark:border-gray-700 shadow-sm">
+    //     <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">
+    //       Portfolio Distribution
+    //     </h4>
+    //     <DoughnutChart data={data} />
+    //   </div>
+    // </aside>
+
+    <aside className="p-4 space-y-6 overflow-y-auto">
+      <div className="flex justify-between text-xs text-gray-500">
+        <span>Watchlist</span>
+        <span>{watchlist.length} / 50</span>
       </div>
 
       <ul className="space-y-2">
-        {watchlist.map((stock) => (
+        {watchlist.map((w) => (
           <WatchListItem
-            key={stock.name}
-            stock={stock}
-            price={prices[stock.name] ?? stock.price}
+            key={w.symbol}
+            symbol={w.symbol}
+            price={prices[w.symbol] ?? 0}
           />
         ))}
       </ul>
 
-      <div className="bg-white dark:bg-gray-900 rounded-xl p-4 border border-gray-200 dark:border-gray-700 shadow-sm">
-        <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">
-          Portfolio Distribution
-        </h4>
-        <DoughnutChart data={data} />
-      </div>
+      {watchlist.length > 0 && (
+        <div className="bg-white dark:bg-gray-900 rounded-xl p-4 border">
+          <h4 className="text-sm font-semibold mb-3">Price Distribution</h4>
+          <DoughnutChart data={chartData} />
+        </div>
+      )}
     </aside>
   );
 }
