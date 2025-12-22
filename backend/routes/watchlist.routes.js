@@ -13,7 +13,8 @@ router.get("/", authMiddleware, async (req, res) => {
 
   const data = user.watchlist.map((symbol) => ({
     symbol,
-    price: simulatedPrices[symbol] ?? null,
+    price: simulatedPrices[symbol].price ?? null,
+    prevClose: simulatedPrices[symbol].prevClose ?? null,
   }));
 
   res.json(data);

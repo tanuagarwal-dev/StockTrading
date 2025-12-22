@@ -5,7 +5,15 @@ import GeneralContext from "@/context/GeneralContext";
 import { DoughnutChart } from "../../charts/DoughnutChart";
 import { api, type PriceMap, type WatchlistEntry } from "@/lib/api";
 
-function WatchListItem({ symbol, price }: { symbol: string; price: number }) {
+function WatchListItem({
+  symbol,
+  price,
+  changePct,
+}: {
+  symbol: string;
+  price: number;
+  changePct?: number;
+}) {
   const [showActions, setShowActions] = useState(false);
   const generalContext = useContext(GeneralContext);
 
@@ -84,8 +92,40 @@ function WatchListItem({ symbol, price }: { symbol: string; price: number }) {
           {symbol}
         </p>
 
-        <span className="font-bold text-gray-900 dark:text-white">
+        <span className="font-bold text-gray-900 dark:text-white inline-flex items-center gap-2">
           ₹{price.toFixed(2)}
+          {typeof changePct === "number" && !Number.isNaN(changePct) && (
+            <span
+              className={changePct >= 0 ? "text-green-600" : "text-red-600"}
+            >
+              {changePct >= 0 ? (
+                <svg
+                  className="inline w-4 h-4"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M5.293 12.707a1 1 0 001.414 0L10 9.414l3.293 3.293a1 1 0 001.414-1.414l-4-4a1 1 0 00-1.414 0l-4 4a1 1 0 001.414 1.414z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+              ) : (
+                <svg
+                  className="inline w-4 h-4"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M14.707 7.293a1 1 0 00-1.414 0L10 10.586 6.707 7.293A1 1 0 105.293 8.707l4 4a1 1 0 001.414 0l4-4a1 1 0 000-1.414z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+              )}
+              {Math.abs(changePct).toFixed(2)}%
+            </span>
+          )}
         </span>
       </div>
 
@@ -210,7 +250,7 @@ export default function WatchList() {
     labels: symbols,
     datasets: [
       {
-        data: symbols.map((s) => prices[s] ?? 0),
+        data: symbols.map((s) => prices[s]?.price ?? 0),
         backgroundColor: [
           "#60a5fa",
           "#34d399",
@@ -285,13 +325,23 @@ export default function WatchList() {
       </div>
 
       <ul className="space-y-2">
-        {watchlist.map((w) => (
-          <WatchListItem
-            key={w.symbol}
-            symbol={w.symbol}
-            price={prices[w.symbol] ?? 0}
-          />
-        ))}
+        {watchlist.map((w) => {
+          const pd = prices[w.symbol];
+          const pct =
+            pd &&
+            typeof pd.price === "number" &&
+            typeof pd.prevClose === "number"
+              ? ((pd.price - pd.prevClose) / pd.prevClose) * 100
+              : undefined;
+          return (
+            <WatchListItem
+              key={w.symbol}
+              symbol={w.symbol}
+              price={pd?.price ?? 0}
+              changePct={pct}
+            />
+          );
+        })}
       </ul>
 
       {watchlist.length > 0 && (

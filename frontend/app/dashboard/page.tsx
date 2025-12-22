@@ -94,7 +94,7 @@ export default function DashboardPage() {
         if (!h || typeof h.price !== "number" || typeof h.avg !== "number") {
           return sum;
         }
-        const currentPrice = livePrices[h.name] ?? h.price;
+        const currentPrice = livePrices[h.name]?.price ?? h.price;
         return sum + (currentPrice - h.avg) * h.qty;
       }, 0),
     [holdings, livePrices]
@@ -134,7 +134,8 @@ export default function DashboardPage() {
                   <span className="text-xl md:text-2xl font-semibold">
                     ₹
                     {(
-                      livePrices[selectedStock.symbol] ?? selectedStock.price
+                      livePrices[selectedStock.symbol]?.price ??
+                      selectedStock.price
                     ).toFixed(2)}
                   </span>
                 </div>
@@ -248,7 +249,10 @@ export default function DashboardPage() {
                   Opening Balance
                 </span>
                 <span className="text-base md:text-lg font-bold text-gray-900 dark:text-white">
-                  ₹{(user.funds.available + user.funds.used).toLocaleString("en-IN")}
+                  ₹
+                  {(user.funds.available + user.funds.used).toLocaleString(
+                    "en-IN"
+                  )}
                 </span>
               </div>
             </div>

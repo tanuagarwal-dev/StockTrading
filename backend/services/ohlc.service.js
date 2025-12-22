@@ -13,7 +13,7 @@ export const updateOhlcFromPrices = () => {
   const candleTime = floorToMinute(now);
 
   Object.keys(simulatedPrices).forEach((symbol) => {
-    const price = simulatedPrices[symbol];
+    const price = simulatedPrices[symbol].price;
     if (!price) return;
 
     if (!ohlcBySymbol[symbol]) {

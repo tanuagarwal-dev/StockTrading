@@ -113,18 +113,25 @@ export interface Position {
 }
 
 // Market Data Types
+export interface PriceData {
+  price: number;
+  prevClose: number;
+}
+
 export interface PriceMap {
-  [symbol: string]: number;
+  [symbol: string]: PriceData;
 }
 
 export interface SinglePrice {
   symbol: string;
   price: number;
+  prevClose: number;
 }
 
 export interface WatchlistEntry {
   symbol: string;
   price: number | null;
+  prevClose?: number | null;
 }
 
 export interface PaginatedSymbolsResponse {

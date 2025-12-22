@@ -18,7 +18,9 @@ export default function MarketPage() {
     mode: "BUY" | "SELL";
   } | null>(null);
   const [symbols, setSymbols] = useState<string[]>([]);
-  const [prices, setPrices] = useState<Record<string, number>>({});
+  const [prices, setPrices] = useState<
+    Record<string, { price: number; prevClose: number }>
+  >({});
   const [page, setPage] = useState(1);
   const [meta, setMeta] = useState<{
     page: number;
@@ -61,7 +63,6 @@ export default function MarketPage() {
     }
   };
 
-
   useEffect(() => {
     fetchPrices();
     fetchWatchlist();
@@ -86,7 +87,7 @@ export default function MarketPage() {
         <h2 className="text-lg font-semibold">Market</h2>
 
         <div className="rounded-md border overflow-hidden">
-          <table className="w-full text-sm">
+          <table className="w-full text-sm text-center">
             <thead className="bg-gray-50 text-gray-600">
               <tr>
                 <th className="px-3 py-2 text-left">Symbol</th>
@@ -132,11 +133,58 @@ export default function MarketPage() {
 
             <tbody>
               {symbols.map((symbol) => (
-                <tr key={symbol} className="border-t">
+                <tr key={symbol} className="border-t text-left">
                   <td className="px-3 py-2 font-medium">{symbol}</td>
 
                   <td className="px-3 py-2">
-                    {prices[symbol]?.toFixed(2) ?? "--"}
+                    {(() => {
+                      const p = prices[symbol];
+                      if (
+                        !p ||
+                        typeof p.price !== "number" ||
+                        typeof p.prevClose !== "number"
+                      ) {
+                        return "--";
+                      }
+                      const changePct =
+                        ((p.price - p.prevClose) / p.prevClose) * 100;
+                      const isUp = changePct >= 0;
+                      return (
+                        <span className="inline-flex items-center gap-2">
+                          <span>₹{p.price.toFixed(2)}</span>
+                          <span
+                            className={isUp ? "text-green-600" : "text-red-600"}
+                          >
+                            {isUp ? (
+                              <svg
+                                className="inline w-4 h-4"
+                                fill="currentColor"
+                                viewBox="0 0 20 20"
+                              >
+                                <path
+                                  fillRule="evenodd"
+                                  d="M5.293 12.707a1 1 0 001.414 0L10 9.414l3.293 3.293a1 1 0 001.414-1.414l-4-4a1 1 0 00-1.414 0l-4 4a1 1 0 001.414 1.414z"
+                                  clipRule="evenodd"
+                                />
+                              </svg>
+                            ) : (
+                              <svg
+                                className="inline w-4 h-4"
+                                fill="currentColor"
+                                viewBox="0 0 20 20"
+                              >
+                                <path
+                                  fillRule="evenodd"
+                                  d="M14.707 7.293a1 1 0 00-1.414 0L10 10.586 6.707 7.293A1 1 0 105.293 8.707l4 4a1 1 0 001.414 0l4-4a1 1 0 000-1.414z"
+                                  clipRule="evenodd"
+                                />
+                              </svg>
+                            )}
+                            {Math.abs(changePct).toFixed(2)}%
+                          </span>
+                        </span>
+                      );
+                    })()}
                   </td>
 
                   <td className="px-3 py-2 flex justify-center items-center gap-2">

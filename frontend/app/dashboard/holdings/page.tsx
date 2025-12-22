@@ -105,45 +105,86 @@ export default function Holdings() {
                 <th className="px-3 py-2">P&amp;L</th>
                 <th className="px-3 py-2">Net chg.</th>
                 <th className="px-3 py-2">Day chg.</th>
-                <th className="px-3 py-2">Sell</th>
-                <th className="px-3 py-2">Buy More</th>
+                <th className="px-3 py-2">Actions</th>
               </tr>
             </thead>
 
             <tbody>
               {allHoldings.map((stock, index) => {
-                const currentPrice = livePrices[stock.name] ?? stock.price;
+                const currentPrice =
+                  livePrices[stock.name]?.price ?? stock.price;
                 const curValue = currentPrice * stock.qty;
                 const pnl = curValue - stock.avg * stock.qty;
                 const isProfit = pnl >= 0;
                 const profitClass = isProfit
                   ? "text-green-600"
                   : "text-red-600";
-                const dayClass = stock.isLoss
-                  ? "text-red-600"
-                  : "text-green-600";
+                const lp = livePrices[stock.name];
+                const prev = lp?.prevClose;
+                const hasPrev = typeof prev === "number" && prev > 0;
+                const pct = hasPrev
+                  ? ((currentPrice - prev) / prev) * 100
+                  : undefined;
+                const absChange = hasPrev ? currentPrice - prev : undefined;
+                const changeClass =
+                  (pct ?? 0) >= 0 ? "text-green-600" : "text-red-600";
 
                 return (
                   <tr key={index} className="border-t">
                     <td className="px-3 py-2">{stock.name}</td>
                     <td className="px-3 py-2 text-center">{stock.qty}</td>
                     <td className="px-3 py-2">{stock.avg.toFixed(2)}</td>
-                    <td className="px-3 py-2">{currentPrice.toFixed(2)}</td>
+                    <td className="px-3 py-2">
+                      <span className="inline-flex items-center gap-2">
+                        <span>{currentPrice.toFixed(2)}</span>
+                      </span>
+                    </td>
                     <td className="px-3 py-2">{curValue.toFixed(2)}</td>
                     <td className={`px-3 py-2 ${profitClass}`}>
                       {pnl.toFixed(2)}
                     </td>
-                    <td className={`px-3 py-2 ${profitClass}`}>{stock.net}</td>
-                    <td className={`px-3 py-2 ${dayClass}`}>{stock.day}</td>
-                    <td className="px-3 py-2">
+                    <td className={`px-3 py-2 ${changeClass}`}>
+                      {absChange !== undefined ? absChange.toFixed(2) : "--"}
+                    </td>
+                    <td className={`px-3 py-2 ${changeClass}`}>
+                      {pct !== undefined && (
+                        <span className={changeClass}>
+                          {(pct ?? 0) >= 0 ? (
+                            <svg
+                              className="inline w-4 h-4"
+                              fill="currentColor"
+                              viewBox="0 0 20 20"
+                            >
+                              <path
+                                fillRule="evenodd"
+                                d="M5.293 12.707a1 1 0 001.414 0L10 9.414l3.293 3.293a1 1 0 001.414-1.414l-4-4a1 1 0 00-1.414 0l-4 4a1 1 0 001.414 1.414z"
+                                clipRule="evenodd"
+                              />
+                            </svg>
+                          ) : (
+                            <svg
+                              className="inline w-4 h-4"
+                              fill="currentColor"
+                              viewBox="0 0 20 20"
+                            >
+                              <path
+                                fillRule="evenodd"
+                                d="M14.707 7.293a1 1 0 00-1.414 0L10 10.586 6.707 7.293A1 1 0 105.293 8.707l4 4a1 1 0 001.414 0l4-4a1 1 0 000-1.414z"
+                                clipRule="evenodd"
+                              />
+                            </svg>
+                          )}
+                          {Math.abs(pct).toFixed(2)}%
+                        </span>
+                      )}
+                    </td>
+                    <td className="px-3 py-2 flex gap-2">
                       <button
                         onClick={() => openSellWindow(stock.name)}
                         className="flex-1 sm:flex-none rounded-lg text-red-600 hover:text-red-700 font-semibold text-sm md:text-base transition duration-200 transform hover:scale-105"
                       >
                         SELL
                       </button>
-                    </td>
-                    <td className="px-3 py-2">
                       <button
                         onClick={() => openBuyWindow(stock.name)}
                         className="flex-1 sm:flex-none font-semibold rounded-lg text-green-600 hover:text-green-700 text-sm md:text-base shadow-lg transition duration-200 transform hover:scale-105"
@@ -158,28 +199,45 @@ export default function Holdings() {
           </table>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-          <div>
-            <h5 className="text-lg font-semibold">
-              29,875.<span className="text-sm">55</span>
-            </h5>
-            <p className="text-sm text-gray-500">Total investment</p>
-          </div>
+        {(() => {
+          const totalInvestment = allHoldings.reduce(
+            (sum, h) => sum + h.avg * h.qty,
+            0
+          );
+          const currentValue = allHoldings.reduce((sum, h) => {
+            const cp = livePrices[h.name]?.price ?? h.price;
+            return sum + cp * h.qty;
+          }, 0);
+          const totalPnl = currentValue - totalInvestment;
+          const pnlPct =
+            totalInvestment > 0 ? (totalPnl / totalInvestment) * 100 : 0;
+          const pnlClass = totalPnl >= 0 ? "text-green-600" : "text-red-600";
 
-          <div>
-            <h5 className="text-lg font-semibold">
-              31,428.<span className="text-sm">95</span>
-            </h5>
-            <p className="text-sm text-gray-500">Current value</p>
-          </div>
+          return (
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+              <div>
+                <h5 className="text-lg font-semibold">
+                  {totalInvestment.toFixed(2)}
+                </h5>
+                <p className="text-sm text-gray-500">Total investment</p>
+              </div>
 
-          <div>
-            <h5 className="text-lg font-semibold text-green-600">
-              1,553.40 (+5.20%)
-            </h5>
-            <p className="text-sm text-gray-500">P&amp;L</p>
-          </div>
-        </div>
+              <div>
+                <h5 className="text-lg font-semibold">
+                  {currentValue.toFixed(2)}
+                </h5>
+                <p className="text-sm text-gray-500">Current value</p>
+              </div>
+
+              <div>
+                <h5 className={`text-lg font-semibold ${pnlClass}`}>
+                  {totalPnl.toFixed(2)} ({Math.abs(pnlPct).toFixed(2)}%)
+                </h5>
+                <p className="text-sm text-gray-500">P&amp;L</p>
+              </div>
+            </div>
+          );
+        })()}
 
         <VerticalGraph data={data} />
       </section>

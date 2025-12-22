@@ -1,14 +1,11 @@
-
-import express from 'express';
+import express from "express";
 import { OrdersModel } from "../model/OrdersModel.js";
 import { simulatedPrices } from "../services/market.service.js";
 import { authMiddleware } from "../middleware/authMiddleware.js";
-import { HoldingsModel } from '../model/HoldingsModel.js';
-import {PositionsModel} from "../model/PositionsModel.js"
-
+import { HoldingsModel } from "../model/HoldingsModel.js";
+import { PositionsModel } from "../model/PositionsModel.js";
 
 const router = express.Router();
-
 
 // app.get("/addHoldings", async (req, res) => {
 //   let tempHoldings = [
@@ -181,7 +178,6 @@ const router = express.Router();
 
 // Protected portfolio & order routes
 
-
 router.get("/allHoldings", authMiddleware, async (req, res) => {
   const allHoldings = await HoldingsModel.find({ user: req.userId });
   res.json(allHoldings);
@@ -268,13 +264,17 @@ router.get("/prices", (req, res) => {
 router.get("/price/:symbol", (req, res) => {
   const symbol = req.params.symbol;
   const upper = symbol.toUpperCase();
-  const price = simulatedPrices[upper];
+  const priceData = simulatedPrices[upper];
 
-  if (price === undefined) {
+  if (!priceData) {
     return res.status(404).json({ message: "Symbol not found" });
   }
 
-  res.json({ symbol: upper, price });
+  res.json({
+    symbol: upper,
+    price: priceData.price,
+    prevClose: priceData.prevClose,
+  });
 });
 
-export default router
+export default router;

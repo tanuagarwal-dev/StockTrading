@@ -35,7 +35,6 @@ router.get("/symbols", (req, res) => {
   });
 });
 
-
 /**
  * GET /market/prices
  */
@@ -48,13 +47,13 @@ router.get("/prices", (req, res) => {
  */
 router.get("/price/:symbol", (req, res) => {
   const symbol = req.params.symbol.toUpperCase();
-  const price = getPrice(symbol);
+  const priceData = simulatedPrices[symbol];
 
-  if (!price) {
+  if (!priceData) {
     return res.status(404).json({ message: "Symbol not found" });
   }
 
-  res.json({ symbol, price });
+  res.json({ symbol, price: priceData.price, prevClose: priceData.prevClose });
 });
 
 export default router;
