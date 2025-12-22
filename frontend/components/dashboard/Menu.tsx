@@ -11,14 +11,14 @@ const tabs = [
   { label: "Holdings", href: "/dashboard/holdings" },
   { label: "Trades", href: "/dashboard/trades" },
   { label: "OHLC", href: "/dashboard/ohlc" },
-  { label: "Funds", href: "/dashboard/funds" },
+  { label: "Wallet", href: "/dashboard/funds" },
   { label: "Market", href: "/dashboard/shares" },
   { label: "Apps", href: "/dashboard/apps" },
 ];
 
 export default function Menu() {
   const pathname = usePathname();
-  const { logout } = useUser()
+  const { logout } = useUser();
   return (
     <div className="lg:h-20 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm">
       <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between px-4 lg:px-6">

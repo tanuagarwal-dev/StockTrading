@@ -51,6 +51,29 @@ export interface FundsResponse {
   };
 }
 
+// Transaction Types
+export interface Transaction {
+  _id: string;
+  userId: string;
+  type: "ADD" | "WITHDRAW";
+  amount: number;
+  balanceBefore: number;
+  balanceAfter: number;
+  description: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface PaginatedTransactionsResponse {
+  transactions: Transaction[];
+  meta: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
+}
+
 // Order Types
 export interface PlaceOrderRequest {
   name: string;
@@ -198,6 +221,24 @@ class API {
     const response = await apiClient.post<FundsResponse>(
       "/funds/withdraw",
       data
+    );
+    return response.data;
+  }
+
+  /**
+   * Get transaction history with pagination (requires auth)
+   * @param page - Page number (default: 1)
+   * @param limit - Items per page (default: 20)
+   */
+  async getTransactions(
+    page: number = 1,
+    limit: number = 20
+  ): Promise<PaginatedTransactionsResponse> {
+    const response = await apiClient.get<PaginatedTransactionsResponse>(
+      "/funds/transactions",
+      {
+        params: { page, limit },
+      }
     );
     return response.data;
   }
