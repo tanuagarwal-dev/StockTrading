@@ -25,9 +25,9 @@ const Team = () => {
 
         <div className="space-y-4">
           <p>
-            Nithin bootstrapped and founded Zerodha in 2010 to overcome the
+            Nithin bootstrapped and founded TradeCraft in 2010 to overcome the
             hurdles he faced during his decade long stint as a trader. Today,
-            Zerodha has changed the landscape of the Indian broking industry.
+            TradeCraft has changed the landscape of the Indian broking industry.
           </p>
 
           <p>

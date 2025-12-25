@@ -6,13 +6,13 @@ const topics = [
       "Offline Account Opening",
       "Company, Partnership and HUF Account Opening",
       "NRI Account Opening",
-      "Charges at Zerodha",
-      "Zerodha IDFC FIRST Bank 3-in-1 Account",
+      "Charges at TradeCraft",
+      "TradeCraft IDFC FIRST Bank 3-in-1 Account",
       "Getting Started",
     ],
   },
   {
-    title: "Your Zerodha Account",
+    title: "Your TradeCraft Account",
     links: [
       "Login Credentials",
       "Account Modification",

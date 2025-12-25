@@ -4,7 +4,7 @@ const OpenAccount = () => {
   return (
     <section className="max-w-7xl mx-auto px-6 py-20 text-center bg-white dark:bg-gray-900">
       <h1 className="text-4xl font-bold mb-4 text-gray-900 dark:text-white">
-        Open a Zerodha account
+        Open a TradeCraft account
       </h1>
 
       <p className="text-gray-600 dark:text-gray-300 mb-8 max-w-2xl mx-auto">

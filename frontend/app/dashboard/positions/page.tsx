@@ -49,7 +49,6 @@ export default function Positions() {
   };
   return (
     <>
-      <Menu />
       <section className="space-y-6 p-4">
         <h3 className="text-lg font-semibold">
           Positions ({allPositions.length})

@@ -73,7 +73,6 @@ export default function MarketPage() {
 
   return (
     <>
-      <Menu />
 
       {activeTrade && (
         <BuyActionWindow

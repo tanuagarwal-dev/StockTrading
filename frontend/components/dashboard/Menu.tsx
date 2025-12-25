@@ -24,7 +24,7 @@ export default function Menu() {
       <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between px-4 lg:px-6">
         <div className="flex items-center justify-between w-full lg:w-auto">
           <Image
-            src="/media/images/zerodhaFundhouse.png"
+            src="/media/images/TradeCraftFundhouse.png"
             alt="Logo"
             width={150}
             height={28}

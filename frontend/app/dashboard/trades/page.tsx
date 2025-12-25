@@ -94,7 +94,6 @@ export default function TradesPage() {
 
   return (
     <>
-      <Menu />
       <CSVExport
         data={trades}
         filename="trades.csv"

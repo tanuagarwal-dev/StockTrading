@@ -14,35 +14,23 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "Zerodha Clone - Stock Trading Platform",
-    template: "%s | Zerodha Clone",
+    default: "TradeCraft - Stock Trading Platform",
+    template: "%s | TradeCraft",
   },
   description:
     "Online platform to invest in stocks, derivatives, mutual funds, and more. Trade with zero brokerage on equity delivery.",
   keywords: [
     "stock trading",
-    "zerodha",
+    "TradeCraft",
     "invest",
     "mutual funds",
     "derivatives",
     "NSE",
     "BSE",
   ],
-  authors: [{ name: "Zerodha Clone" }],
-  openGraph: {
-    type: "website",
-    locale: "en_IN",
-    url: "https://zerodha-clone.com",
-    siteName: "Zerodha Clone",
-    title: "Zerodha Clone - Stock Trading Platform",
-    description:
-      "Online platform to invest in stocks, derivatives, mutual funds, and more.",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "Zerodha Clone - Stock Trading Platform",
-    description:
-      "Online platform to invest in stocks, derivatives, mutual funds, and more.",
+  icons: {
+    icon: [{ url: "/favicon.svg", type: "image/svg+xml" }],
+    apple: [{ url: "/favicon.svg", type: "image/svg+xml" }],
   },
 };
 

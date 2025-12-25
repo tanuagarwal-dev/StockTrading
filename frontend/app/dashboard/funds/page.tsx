@@ -69,7 +69,7 @@ export default function Funds() {
 
   return (
     <>
-      <Menu />
+      
 
       {modal && <FundsModal type={modal} onClose={handleModalClose} />}
 

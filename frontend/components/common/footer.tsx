@@ -9,14 +9,14 @@ const Footer = () => {
           <div>
             <Image
               src="/media/images/logo.svg"
-              alt="Zerodha"
+              alt="TradeCraft"
               width={128}
               height={32}
               sizes="128px"
               className="w-32 mb-4"
             />
             <p className="text-sm text-gray-600 dark:text-gray-400">
-              © 2010 – 2024, Not Zerodha Broking Ltd. All rights reserved.
+              © 2010 – 2024, Not TradeCraft Broking Ltd. All rights reserved.
             </p>
           </div>
 
@@ -70,7 +70,7 @@ const Footer = () => {
                   href="#"
                   className="hover:text-blue-600 dark:hover:text-blue-400"
                 >
-                  Zerodha.tech
+                  TradeCraft.tech
                 </Link>
               </li>
               <li>
@@ -86,7 +86,7 @@ const Footer = () => {
                   href="#"
                   className="hover:text-blue-600 dark:hover:text-blue-400"
                 >
-                  Zerodha cares (CSR)
+                  TradeCraft cares (CSR)
                 </Link>
               </li>
             </ul>
@@ -175,11 +175,11 @@ const Footer = () => {
 
         <div className="mt-12 text-xs text-gray-500 dark:text-gray-400 space-y-4 leading-relaxed">
           <p>
-            Zerodha Broking Ltd.: Member of NSE & BSE – SEBI Registration no.:
-            INZ000031633 CDSL: Depository services through Zerodha Securities
-            Pvt. Ltd. – SEBI Registration no.: IN-DP-100-2015 Commodity Trading
-            through Zerodha Commodities Pvt. Ltd. MCX: 46025 – SEBI Registration
-            no.: INZ000038238
+            TradeCraft Broking Ltd.: Member of NSE & BSE – SEBI Registration
+            no.: INZ000031633 CDSL: Depository services through TradeCraft
+            Securities Pvt. Ltd. – SEBI Registration no.: IN-DP-100-2015
+            Commodity Trading through TradeCraft Commodities Pvt. Ltd. MCX:
+            46025 – SEBI Registration no.: INZ000038238
           </p>
 
           <p>

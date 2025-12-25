@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const apiClient = axios.create({
-  baseURL: "http://localhost:3002",
+  baseURL: process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:4000",
 });
 
 apiClient.interceptors.request.use((config) => {
@@ -16,5 +16,3 @@ apiClient.interceptors.request.use((config) => {
 });
 
 export default apiClient;
-
-

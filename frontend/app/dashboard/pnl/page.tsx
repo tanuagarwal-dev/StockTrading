@@ -101,59 +101,132 @@ export default function PnlReportPage() {
   return (
     <>
       <Menu />
-      <section className="space-y-6 p-4">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div>
-            <h3 className="text-lg font-semibold">P&amp;L Report</h3>
-            <p className="text-xs text-gray-500">
-              Realized P&amp;L for executed SELL orders in the selected range,
-              plus current unrealized P&amp;L from holdings.
-            </p>
-          </div>
+      <section className="space-y-6 p-6">
+        <div className="space-y-2 mb-8">
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+            P&L Report
+          </h1>
+          <p className="text-sm text-gray-500 dark:text-gray-400">
+            Track your realized and unrealized profit & loss
+          </p>
+        </div>
 
-          <div className="flex flex-wrap items-center gap-3 text-sm">
-            <label className="text-gray-600">
-              From:
-              <input
+        {/* Date Range Selector */}
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow border border-gray-200 dark:border-gray-700 p-6">
+          <div className="flex flex-col sm:flex-row sm:items-end gap-4">
+            <div className="flex-1">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                From Date
+              </label>
+              <input title="date"
                 type="date"
                 value={startDate}
                 onChange={(e) => setStartDate(e.target.value)}
-                className="ml-2 border px-2 py-1 text-sm"
+                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
-            </label>
-            <label className="text-gray-600">
-              To:
-              <input
+            </div>
+            <div className="flex-1">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                To Date
+              </label>
+              <input title="date"
                 type="date"
                 value={endDate}
                 onChange={(e) => setEndDate(e.target.value)}
-                className="ml-2 border px-2 py-1 text-sm"
+                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
-            </label>
+            </div>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 text-sm">
-          <div>
-            <p className="text-gray-500">Realized P&amp;L (range)</p>
-            <p className={`text-lg font-semibold ${pnlClass(realizedPnl)}`}>
-              {formatPnl(realizedPnl)}
+        {/* P&L Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {/* Realized P&L */}
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow border border-gray-200 dark:border-gray-700 p-6">
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="text-sm font-semibold text-gray-600 dark:text-gray-400">
+                Realized P&L
+              </h3>
+              <svg
+                className="w-5 h-5 text-blue-500"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"
+                />
+              </svg>
+            </div>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">
+              (Executed sell orders in range)
+            </p>
+            <p className={`text-3xl font-bold ${pnlClass(realizedPnl)}`}>
+              ₹{formatPnl(realizedPnl)}
             </p>
           </div>
 
-          <div>
-            <p className="text-gray-500">Unrealized P&amp;L (current)</p>
-            <p className={`text-lg font-semibold ${pnlClass(unrealizedPnl)}`}>
-              {formatPnl(unrealizedPnl)}
+          {/* Unrealized P&L */}
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow border border-gray-200 dark:border-gray-700 p-6">
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="text-sm font-semibold text-gray-600 dark:text-gray-400">
+                Unrealized P&L
+              </h3>
+              <svg
+                className="w-5 h-5 text-amber-500"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+            </div>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">
+              (Current holdings)
+            </p>
+            <p className={`text-3xl font-bold ${pnlClass(unrealizedPnl)}`}>
+              ₹{formatPnl(unrealizedPnl)}
             </p>
           </div>
 
-          <div>
-            <p className="text-gray-500">Total P&amp;L</p>
-            <p className={`text-lg font-semibold ${pnlClass(totalPnl)}`}>
-              {formatPnl(totalPnl)}
-            </p>
+          {/* Total P&L */}
+          <div className="bg-gradient-to-br from-blue-600 to-blue-700 dark:from-blue-700 dark:to-blue-800 rounded-lg shadow border border-blue-700 dark:border-blue-600 p-6 text-white">
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="text-sm font-semibold">Total P&L</h3>
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+            </div>
+            <p className="text-xs opacity-90 mb-3">Realized + Unrealized</p>
+            <p className="text-3xl font-bold">₹{formatPnl(totalPnl)}</p>
           </div>
+        </div>
+
+        {/* Info Section */}
+        <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+          <p className="text-sm text-blue-800 dark:text-blue-200">
+            💡 <strong>Note:</strong> Realized P&L is calculated from executed
+            SELL orders within the selected date range. Unrealized P&L reflects
+            your current open positions.
+          </p>
         </div>
       </section>
     </>

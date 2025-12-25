@@ -2,8 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import WatchList from "@/components/dashboard/WatchList";
-import TopBar from "@/components/dashboard/TopBar";
+import Sidebar from "@/components/dashboard/Sidebar";
 import Menu from "@/components/dashboard/Menu";
 import { GeneralContextProvider } from "@/context/GeneralContext";
 import { UserProvider, useUser } from "@/context/UserContext";
@@ -52,11 +51,11 @@ export default function DashboardLayout({
               />
             )}
 
-            <div className="flex">
+            <div className="flex h-screen overflow-hidden">
               <aside
                 className={`
-                  fixed lg:static inset-y-0 left-0 z-40
-                  w-80 border-r border-gray-200 dark:border-gray-700 
+                  fixed inset-y-0 left-0 z-40
+                  w-64 border-r border-gray-200 dark:border-gray-700 
                   bg-white dark:bg-gray-800 shadow-lg
                   transform transition-transform duration-300
                   ${
@@ -66,12 +65,10 @@ export default function DashboardLayout({
                   }
                 `}
               >
-                <TopBar />
-                <WatchList />
+                <Sidebar />
               </aside>
 
-              <main className="flex-1 w-full text-black dark:text-white">
-               
+              <main className="flex-1 w-full text-black dark:text-white overflow-y-auto lg:ml-64">
                 {children}
               </main>
             </div>

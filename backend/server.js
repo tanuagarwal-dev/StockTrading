@@ -4,7 +4,7 @@ import app from './app.js';
 dotenv.config();
 
 
-const PORT = process.env.PORT || 3002;
+const PORT = process.env.PORT || 4000;
 const MONGO_URI = process.env.MONGO_URL;
 if (!MONGO_URI) {
   console.log("Mongoose URL not defined in.env");

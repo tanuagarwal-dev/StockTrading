@@ -76,7 +76,6 @@ export default function Holdings() {
 
   return (
     <>
-      <Menu />
       <CSVExport
         data={allHoldings}
         filename="holdings.csv"

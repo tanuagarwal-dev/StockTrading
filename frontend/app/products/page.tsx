@@ -29,7 +29,7 @@ const page = () => {
       <RightSection
         imageURL="media/images/console.png"
         productName="Console"
-        productDescription="The central dashboard for your Zerodha account. Gain insights into your trades and investments with in-depth reports and visualisations."
+        productDescription="The central dashboard for your TradeCraft account. Gain insights into your trades and investments with in-depth reports and visualisations."
         learnMore=""
       />
       <LeftSection
@@ -57,8 +57,8 @@ const page = () => {
         appStore=""
       />
       <p className="text-center mt-5 mb-5">
-        Want to know more about our technology stack? Check out the Zerodha.tech
-        blog.
+        Want to know more about our technology stack? Check out the
+        TradeCraft.tech blog.
       </p>
       <Universe />
       <Footer />

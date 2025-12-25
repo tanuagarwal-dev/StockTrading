@@ -3,7 +3,7 @@ import Image from "next/image";
 const Universe = () => {
   return (
     <section className="max-w-7xl mx-auto px-6 mt-20 text-center">
-      <h1 className="text-4xl font-bold mb-4">The Zerodha Universe</h1>
+      <h1 className="text-4xl font-bold mb-4">The TradeCraft Universe</h1>
 
       <p className="text-gray-600 mb-12">
         Extend your trading and investment experience even further with our

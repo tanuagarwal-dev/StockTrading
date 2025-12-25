@@ -15,7 +15,7 @@ const Stats = () => {
                 Customer-first always
               </h2>
               <p>
-                That&apos;s why 1.3+ crore customers trust Zerodha with ₹3.5+
+                That&apos;s why 1.3+ crore customers trust TradeCraft with ₹3.5+
                 lakh crores worth of equity investments.
               </p>
             </div>
@@ -32,7 +32,7 @@ const Stats = () => {
 
             <div>
               <h2 className="text-lg font-medium text-gray-900 dark:text-white mb-1">
-                The Zerodha universe
+                The TradeCraft universe
               </h2>
               <p>
                 Not just an app, but a whole ecosystem. Our investments in 30+

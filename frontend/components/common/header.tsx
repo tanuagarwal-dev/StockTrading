@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import Image from "next/image";
+import Logo from "./Logo";
 
 const THEME_KEY = "theme";
 
@@ -47,14 +47,7 @@ const Header = () => {
     <header className="border-b border-gray-200 bg-white dark:bg-gray-900 dark:border-gray-700">
       <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
         <Link href="/">
-          <Image
-            src="/media/images/logo.svg"
-            alt="Logo"
-            width={128}
-            height={32}
-            sizes="128px"
-            className="w-32"
-          />
+          <Logo iconSize={36} />
         </Link>
 
         <nav className="hidden md:flex gap-8 text-sm font-medium text-gray-700 dark:text-gray-100">
@@ -102,7 +95,7 @@ const Header = () => {
             onClick={toggleTheme}
             className="hidden md:inline-flex items-center rounded-full border border-gray-300 dark:border-gray-600 px-3 py-1 text-xs font-medium text-gray-700 dark:text-gray-100 bg-white dark:bg-gray-800"
           >
-            {isDark ? "Dark" : "Light"}
+            {isDark ? "Light" : "Dark"}
           </button>
 
           <button

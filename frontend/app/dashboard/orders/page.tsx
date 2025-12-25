@@ -71,7 +71,6 @@ export default function Orders() {
   // };
   return (
     <>
-      <Menu />
       {allOrders.length === 0 ? (
         <div className="p-4 flex items-center justify-center min-h-[60vh]">
           <div className="text-center space-y-4">

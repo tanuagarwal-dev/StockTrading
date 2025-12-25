@@ -21,7 +21,7 @@ const Awards = () => {
           </h1>
 
           <p className="text-gray-600 dark:text-gray-300 mb-8">
-            2+ million Zerodha clients contribute to over 15% of all retail
+            2+ million TradeCraft clients contribute to over 15% of all retail
             order volumes in India daily by trading and investing in:
           </p>
 
