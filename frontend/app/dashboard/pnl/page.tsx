@@ -100,7 +100,6 @@ export default function PnlReportPage() {
 
   return (
     <>
-      <Menu />
       <section className="space-y-6 p-6">
         <div className="space-y-2 mb-8">
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
@@ -118,7 +117,8 @@ export default function PnlReportPage() {
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 From Date
               </label>
-              <input title="date"
+              <input
+                title="date"
                 type="date"
                 value={startDate}
                 onChange={(e) => setStartDate(e.target.value)}
@@ -129,7 +129,8 @@ export default function PnlReportPage() {
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 To Date
               </label>
-              <input title="date"
+              <input
+                title="date"
                 type="date"
                 value={endDate}
                 onChange={(e) => setEndDate(e.target.value)}

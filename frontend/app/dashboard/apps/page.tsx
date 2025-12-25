@@ -4,6 +4,16 @@ import Menu from "@/components/dashboard/Menu";
 const Apps = () => {
   return (
     <>
+      <section className="p-4 space-y-6">
+        <div className="space-y-2">
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+            Trading Apps
+          </h1>
+          <p className="text-sm text-gray-500 dark:text-gray-400">
+            Powerful trading tools and applications
+          </p>
+        </div>
+      </section>
       <div className="p-6 min-h-[60vh] flex items-center justify-center">
         <div className="text-center space-y-6 max-w-md">
           <div className="flex justify-center">

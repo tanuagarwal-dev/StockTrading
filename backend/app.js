@@ -8,6 +8,7 @@ import ordersRoutes from "./routes/order.routes.js";
 import readOnlyRoutes from "./routes/readOnly.routes.js";
 import marketRoutes from "./routes/market.routes.js";
 import watchlistRoutes from "./routes/watchlist.routes.js";
+import indicesRoutes from "./routes/indices.routes.js";
 
 const app = express();
 
@@ -30,6 +31,7 @@ app.use("/funds", fundsRoutes);
 app.use("/orders", ordersRoutes);
 app.use("/market", marketRoutes);
 app.use("/watchlist", watchlistRoutes);
+app.use("/indices", indicesRoutes);
 // app.use("/holdings", holdingsRoutes);
 // app.use("/prices", pricesRoutes);
 app.use("/ohlc", ohlcRoutes);

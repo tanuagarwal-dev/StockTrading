@@ -4,6 +4,7 @@
 // This page requires client interactivity
 import { useContext, useEffect, useMemo, useState } from "react";
 import Menu from "@/components/dashboard/Menu";
+import MarketIndices from "@/components/dashboard/MarketIndices";
 import GeneralContext from "@/context/GeneralContext";
 import { useUser } from "@/context/UserContext";
 import {
@@ -167,6 +168,14 @@ export default function DashboardPage() {
             </div>
           </div>
         )}
+
+        {/* Market Indices */}
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4 md:p-6 border border-gray-200 dark:border-gray-700">
+          <h3 className="text-base md:text-lg font-bold text-gray-900 dark:text-white mb-4 md:mb-6">
+            Market Indices
+          </h3>
+          <MarketIndices />
+        </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
           {/* P&L Summary */}
